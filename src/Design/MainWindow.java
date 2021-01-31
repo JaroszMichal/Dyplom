@@ -1,5 +1,7 @@
 package Design;
 
+import Project.SystemSterowania;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -13,10 +15,10 @@ public class MainWindow extends JFrame {
     private JLabel trasaOpisLBL;
     private JLabel autoIcoLBL;
     private JLabel autoOpisLBL;
-    private JButton speedButton;
+    private JButton predkoscBTN;
     private JLabel speedIcoLBL;
     private JLabel speedOpisLBL;
-    private JButton zdefiniujButton;
+    private JButton skretBTN;
     private JButton startButton;
     private JButton historiaButton;
     private JLabel turnIcoLBL;
@@ -25,9 +27,10 @@ public class MainWindow extends JFrame {
     private JLabel light3LBL;
     private JLabel light4LBL;
     private JLabel testLBL;
-    private final SterowanieWindow[] sw = {null, null};
+    private SystemSterowania systemSterowania;
+    private final SilnikWindow[] sw = {null, null};
 
-    public SterowanieWindow getSw(int i) {
+    public SilnikWindow getSw(int i) {
         return sw[i];
     }
 
@@ -44,6 +47,7 @@ public class MainWindow extends JFrame {
     }
 
     public MainWindow(){
+        systemSterowania = new SystemSterowania();
         add(mainPanel);
         setSize(700,500);
         setTitle("Praca dyplomowa - Michał Jarosz");
@@ -58,30 +62,19 @@ public class MainWindow extends JFrame {
         light3LBL.setIcon(Red(40));
         light4LBL.setIcon(Red(40));
 
-//        validate();
-//        final ValueReturningWindow[] vw = {null};
-//                button1.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                if (vw[0] == null)
-//                    vw[0] = new ValueReturningWindow(MainWindow.this);
-//                vw[0].setVisible(true);
-//            }
-//        });
-
-        speedButton.addActionListener(new ActionListener() {
+        predkoscBTN.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (sw[0] == null)
-                    sw[0] = new SterowanieWindow(MainWindow.this, 0);
+                    sw[0] = new SilnikWindow(systemSterowania, MainWindow.this, 0);
                 sw[0].setVisible(true);
             }
         });
-        zdefiniujButton.addActionListener(new ActionListener() {
+        skretBTN.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (sw[1] == null)
-                    sw[1] = new SterowanieWindow(MainWindow.this, 1);
+                    sw[1] = new SilnikWindow(systemSterowania, MainWindow.this, 1);
                 sw[1].setVisible(true);
             }
         });

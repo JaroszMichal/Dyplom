@@ -1,5 +1,7 @@
 package Project;
 
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,91 +12,37 @@ public class FunkcjaLiniowa {
 
 //  Nazwa funkcji
     private String nazwa;
-//  dziedzina
-//  lewostronna
-    private boolean dziedzinaCzyOdNiesk;
-    private double dziedzinaOdWart;
-    private boolean dziedzinaOdCzyNalezy;
-//  prawostronna
-    private boolean dziedzinaCzyDoNiesk;
-    private double dziedzinaDoWart;
-    private boolean dziedzinaDoCzyNalezy;
-
-//  lista punktów funkcji
+    private DziedzinaCzujnika dziedzinaCzujnika;
+    //  lista punktów funkcji
     private List<Punkt> punkty;
 
+    public DziedzinaCzujnika getDziedzinaCzujnika() {
+        return dziedzinaCzujnika;
+    }
+    public void setDziedzinaCzujnika(DziedzinaCzujnika dziedzinaCzujnika) {
+        this.dziedzinaCzujnika = dziedzinaCzujnika;
+    }
     public String getNazwa() {
         return nazwa;
     }
-
     public void setNazwa(String nazwa) {
         this.nazwa = nazwa;
     }
-
-    public boolean isDziedzinaCzyOdNiesk() {
-        return dziedzinaCzyOdNiesk;
-    }
-
-    public void setDziedzinaCzyOdNiesk(boolean dziedzinaCzyOdNiesk) {
-        this.dziedzinaCzyOdNiesk = dziedzinaCzyOdNiesk;
-    }
-
-    public double getDziedzinaOdWart() {
-        return dziedzinaOdWart;
-    }
-
-    public void setDziedzinaOdWart(double dziedzinaOdWart) {
-        this.dziedzinaOdWart = dziedzinaOdWart;
-    }
-
-    public boolean isDziedzinaOdCzyNalezy() {
-        return dziedzinaOdCzyNalezy;
-    }
-
-    public void setDziedzinaOdCzyNalezy(boolean dziedzinaOdCzyNalezy) {
-        this.dziedzinaOdCzyNalezy = dziedzinaOdCzyNalezy;
-    }
-
-    public boolean isDziedzinaCzyDoNiesk() {
-        return dziedzinaCzyDoNiesk;
-    }
-
-    public void setDziedzinaCzyDoNiesk(boolean dziedzinaCzyDoNiesk) {
-        this.dziedzinaCzyDoNiesk = dziedzinaCzyDoNiesk;
-    }
-
-    public double getDziedzinaDoWart() {
-        return dziedzinaDoWart;
-    }
-
-    public void setDziedzinaDoWart(double dziedzinaDoWart) {
-        this.dziedzinaDoWart = dziedzinaDoWart;
-    }
-
-    public boolean isDziedzinaDoCzyNalezy() {
-        return dziedzinaDoCzyNalezy;
-    }
-
-    public void setDziedzinaDoCzyNalezy(boolean dziedzinaDoCzyNalezy) {
-        this.dziedzinaDoCzyNalezy = dziedzinaDoCzyNalezy;
-    }
-
     public List<Punkt> getPunkty() {
         return punkty;
     }
-
     public void setPunkty(List<Punkt> punkty) {
         this.punkty = punkty;
     }
 
     public FunkcjaLiniowa(){
         nazwa = "no name";
-        dziedzinaCzyOdNiesk = true;
-        dziedzinaOdWart = -1;
-        dziedzinaOdCzyNalezy = true;
-        dziedzinaCzyDoNiesk = true;
-        dziedzinaDoWart = 1;
-        dziedzinaDoCzyNalezy = true;
+        dziedzinaCzujnika = new DziedzinaCzujnika(true, -1, true, true, 1, true);
+        punkty = new ArrayList<Punkt>();
+    }
+    public FunkcjaLiniowa(DziedzinaCzujnika dziedzinaCzujnika){
+        nazwa = "no name";
+        this.dziedzinaCzujnika = dziedzinaCzujnika;
         punkty = new ArrayList<Punkt>();
     }
 
@@ -116,9 +64,29 @@ public class FunkcjaLiniowa {
         return 0;
     }
 
+    public int Usun(Punkt p){
+        if (!CzyJuzJestTakiX(p.getX()))
+            return 1;
+        punkty.remove(Pozycja(p));
+        return 0;
+    }
+
+    public int Zmien(Punkt p1, Punkt p2){
+        if (!CzyJuzJestTakiX(p1.getX()))
+            return 1;
+        punkty.set(Pozycja(p1), p2);
+        return 0;
+    }
+
+    private int Pozycja(Punkt p) {
+        for (int i=0; i<punkty.size();i++)
+            if ((punkty.get(i).getX() == p.getX())&&(punkty.get(i).getY() == p.getY())) return i;
+        return -1;
+    }
+
     private boolean CzyJestSpozaDziedziny(double x) {
-        if ((!dziedzinaCzyOdNiesk) && ((x<dziedzinaOdWart) || ((!dziedzinaOdCzyNalezy)&&(x==dziedzinaOdWart)))) return true;
-        if ((!dziedzinaCzyDoNiesk) && ((x>dziedzinaDoWart) || ((!dziedzinaDoCzyNalezy)&&(x==dziedzinaDoWart)))) return true;
+        if ((!dziedzinaCzujnika.isDziedzinaCzyOdNiesk()) && ((x<dziedzinaCzujnika.getDziedzinaOdWart()) || ((!dziedzinaCzujnika.isDziedzinaOdCzyNalezy())&&(x==dziedzinaCzujnika.getDziedzinaOdWart())))) return true;
+        if ((!dziedzinaCzujnika.isDziedzinaCzyDoNiesk()) && ((x>dziedzinaCzujnika.getDziedzinaDoWart()) || ((!dziedzinaCzujnika.isDziedzinaDoCzyNalezy())&&(x==dziedzinaCzujnika.getDziedzinaDoWart())))) return true;
         return false;
     }
 
@@ -127,5 +95,4 @@ public class FunkcjaLiniowa {
             if (punkty.get(i).getX() == x) return true;
         return false;
     }
-
 }
