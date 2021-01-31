@@ -27,6 +27,10 @@ public class FunkcjeCzujnika extends JFrame{
     private int FrameHeight = 500;
     DefaultListModel dm = new DefaultListModel();
 
+    public JComboBox getCzujnikCMB() {
+        return czujnikCMB;
+    }
+
     public FunkcjeCzujnika(SystemSterowania systemSterowania, SilnikWindow sw, int ktorySilnik, int ktoryCzujnik){
         add(mainPanel);
         setSize(800,FrameHeight);
@@ -45,7 +49,7 @@ public class FunkcjeCzujnika extends JFrame{
         setTitle("Definiowanie silnika - "+title);
         mainPanel.setBorder(BorderFactory.createTitledBorder(title));
         UstawPolaFormularza(systemSterowania,ktorySilnik,ktoryCzujnik);
-        setLocation(20,20);
+        setLocation(20,40);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         dodajButton.addActionListener(new ActionListener() {

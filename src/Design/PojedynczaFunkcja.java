@@ -27,6 +27,8 @@ public class PojedynczaFunkcja extends JFrame {
     private JLabel KomunikatLBL;
     private JLabel dziedzinaLBL;
     private JTable punktyTBL;
+    private WykresPanel wykresPNL;
+    private JLabel czujnikLBL;
     private int FrameHeight = 500;
     String nazwafunkcji;
 
@@ -50,7 +52,7 @@ public class PojedynczaFunkcja extends JFrame {
         sorter.setSortKeys(sortKeys);
         sorter.sort();
 
-        InitComponents(fl);
+        InitComponents(fc, fl);
         setVisible(true);
 
         dodajBTN.addActionListener(new ActionListener() {
@@ -65,6 +67,7 @@ public class PojedynczaFunkcja extends JFrame {
                             row[0] = xTF.getText();
                             row[1] = yTF.getText();
                             dtm.addRow(row);
+                            wykresPNL.ZaktualizujWartoscFunkcji(fl);
 
                             xTF.setText("");
                             yTF.setText("");
@@ -117,6 +120,7 @@ public class PojedynczaFunkcja extends JFrame {
                         else {
                             dtm.removeRow(IndekswTabeli(dtm, selectedRow));
                             KomunikatLBL.setText("Pozycja usunięta.");
+                            wykresPNL.ZaktualizujWartoscFunkcji(fl);
                             xTF.setText("");
                             yTF.setText("");
                         }
@@ -148,6 +152,7 @@ public class PojedynczaFunkcja extends JFrame {
                             dtm.setValueAt(xTF.getText(), selectedRow,0);
                             dtm.setValueAt(yTF.getText(), selectedRow,1);
                             KomunikatLBL.setText("Zmiana zapisana.");
+                            wykresPNL.ZaktualizujWartoscFunkcji(fl);
                         }
                     }
                     catch (Exception e1){
@@ -165,6 +170,7 @@ public class PojedynczaFunkcja extends JFrame {
                 fl.getPunkty().clear();
                 dtm.setNumRows(0);
                 KomunikatLBL.setText("Usunięto wszystkie dane z tabeli.");
+                wykresPNL.ZaktualizujWartoscFunkcji(fl);
             }
         });
     }
@@ -181,10 +187,12 @@ public class PojedynczaFunkcja extends JFrame {
         return -1;
     }
 
-    private void InitComponents(FunkcjaLiniowa fl) {
+    private void InitComponents(FunkcjeCzujnika funkcjeCzujnika, FunkcjaLiniowa fl) {
         setTitles(fl.getNazwa());
         dziedzinaLBL.setText(opsiDziedziny(fl));
+        czujnikLBL.setText(funkcjeCzujnika.getCzujnikCMB().getSelectedItem().toString());
         nazwaTF.setText(fl.getNazwa());
+        wykresPNL.setFl(fl);
     }
 
     private void setTitles(String s) {
@@ -213,5 +221,4 @@ public class PojedynczaFunkcja extends JFrame {
             s += ")";
         return s;
     }
-
 }
