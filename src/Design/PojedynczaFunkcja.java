@@ -52,7 +52,7 @@ public class PojedynczaFunkcja extends JFrame {
         sorter.setSortKeys(sortKeys);
         sorter.sort();
 
-        InitComponents(fc, fl);
+        InitComponents(systemSterowania,ktorySilnik, ktoryCzujnik, fc, fl, dtm);
         setVisible(true);
 
         dodajBTN.addActionListener(new ActionListener() {
@@ -68,7 +68,7 @@ public class PojedynczaFunkcja extends JFrame {
                             row[1] = yTF.getText();
                             dtm.addRow(row);
                             wykresPNL.ZaktualizujWartoscFunkcji(fl);
-
+                            fc.getWykresPNL().ZaktualizujWartoscListyFunkcji(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik),"");
                             xTF.setText("");
                             yTF.setText("");
                             break;
@@ -99,8 +99,8 @@ public class PojedynczaFunkcja extends JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-                xTF.setText((String)punktyTBL.getValueAt(punktyTBL.getSelectedRow(),0));
-                yTF.setText((String)punktyTBL.getValueAt(punktyTBL.getSelectedRow(),1));
+                xTF.setText(String.valueOf(punktyTBL.getValueAt(punktyTBL.getSelectedRow(),0)));
+                yTF.setText(String.valueOf(punktyTBL.getValueAt(punktyTBL.getSelectedRow(),1)));
             }
         });
         usunBTN.addActionListener(new ActionListener() {
@@ -121,6 +121,7 @@ public class PojedynczaFunkcja extends JFrame {
                             dtm.removeRow(IndekswTabeli(dtm, selectedRow));
                             KomunikatLBL.setText("Pozycja usunięta.");
                             wykresPNL.ZaktualizujWartoscFunkcji(fl);
+                            fc.getWykresPNL().ZaktualizujWartoscListyFunkcji(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik),"");
                             xTF.setText("");
                             yTF.setText("");
                         }
@@ -152,6 +153,7 @@ public class PojedynczaFunkcja extends JFrame {
                             dtm.setValueAt(xTF.getText(), selectedRow,0);
                             dtm.setValueAt(yTF.getText(), selectedRow,1);
                             KomunikatLBL.setText("Zmiana zapisana.");
+                            fc.getWykresPNL().ZaktualizujWartoscListyFunkcji(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik),"");
                             wykresPNL.ZaktualizujWartoscFunkcji(fl);
                         }
                     }
@@ -170,6 +172,7 @@ public class PojedynczaFunkcja extends JFrame {
                 fl.getPunkty().clear();
                 dtm.setNumRows(0);
                 KomunikatLBL.setText("Usunięto wszystkie dane z tabeli.");
+                fc.getWykresPNL().ZaktualizujWartoscListyFunkcji(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik),"");
                 wykresPNL.ZaktualizujWartoscFunkcji(fl);
             }
         });
@@ -187,12 +190,21 @@ public class PojedynczaFunkcja extends JFrame {
         return -1;
     }
 
-    private void InitComponents(FunkcjeCzujnika funkcjeCzujnika, FunkcjaLiniowa fl) {
+    private void InitComponents(SystemSterowania systemSterowania, int ktorySilnik, int ktoryCzujnik,FunkcjeCzujnika funkcjeCzujnika, FunkcjaLiniowa fl, DefaultTableModel dtm) {
         setTitles(fl.getNazwa());
         dziedzinaLBL.setText(opsiDziedziny(fl));
         czujnikLBL.setText(funkcjeCzujnika.getCzujnikCMB().getSelectedItem().toString());
         nazwaTF.setText(fl.getNazwa());
         wykresPNL.setFl(fl);
+        for (int i=0; i<fl.getPunkty().size();i++) {
+            Object[] row = new Object[2];
+            row[0] = fl.getPunkty().get(i).getX();
+            row[1] = fl.getPunkty().get(i).getY();
+            dtm.addRow(row);
+        }
+        wykresPNL.ZaktualizujWartoscFunkcji(fl);
+        funkcjeCzujnika.getWykresPNL().ZaktualizujWartoscListyFunkcji(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik),"");
+
     }
 
     private void setTitles(String s) {

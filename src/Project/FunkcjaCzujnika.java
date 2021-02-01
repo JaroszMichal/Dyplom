@@ -25,6 +25,12 @@ public class FunkcjaCzujnika {
     public List<FunkcjaLiniowa> getListaFunkcji() {
         return listaFunkcji;
     }
+    public FunkcjaLiniowa getFunkcja(String nazwa) {
+        for (int i=0; i<listaFunkcji.size();i++)
+            if (listaFunkcji.get(i).getNazwa().equals(nazwa))
+                return listaFunkcji.get(i);
+        return null;
+    }
     public void setListaFunkcji(List<FunkcjaLiniowa> listaFunkcji) {
         this.listaFunkcji = listaFunkcji;
     }
@@ -55,5 +61,19 @@ public class FunkcjaCzujnika {
     }
     public void DodajFunkcjeDoListy(FunkcjaLiniowa funkcjaLiniowa){
         listaFunkcji.add(funkcjaLiniowa);
+    }
+
+    public boolean UsunFunkcjeZListy(FunkcjaLiniowa funkcjaLiniowa){
+        try {
+            listaFunkcji.remove(funkcjaLiniowa);
+            return true;
+        }
+        catch (Exception e){
+            return false;
+        }
+    }
+
+    public void WyczyscFunkcjeZListy() {
+        listaFunkcji.clear();
     }
 }

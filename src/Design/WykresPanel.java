@@ -1,6 +1,7 @@
 package Design;
 
 
+import Project.FunkcjaCzujnika;
 import Project.FunkcjaLiniowa;
 
 import javax.swing.*;
@@ -8,23 +9,146 @@ import java.awt.*;
 
 public class WykresPanel extends JPanel {
     private FunkcjaLiniowa fl;
+    private FunkcjaCzujnika fc;
+    private int ileFunkcji; //1 - 1 funkcja, 2 - wiele
     double lewo, prawo, gora, dol;
     String lewoOpis, prawoOpis, goraOpis, dolOpis;
-    int zapas;
+    private static final int zapas = 20;
+    private static final Color[] KoloryWykresow = {Color.BLUE, Color.green, Color.GRAY, Color.YELLOW, Color.CYAN};
+    private String PodswietNaCzerwono;
+
     public void setFl(FunkcjaLiniowa fl) {
         this.fl = fl;
+    }
+
+    public int getIleFunkcji() {
+        return ileFunkcji;
+    }
+
+    public void setIleFunkcji(int ileFunkcji) {
+        this.ileFunkcji = ileFunkcji;
     }
 
     //    @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        WyliczWartosci();
-        NarysujUkładWspolrzednych(g);
-        NarysujWykres(g);
+        if (ileFunkcji==1) {
+            WyliczWartosci();
+            NarysujUkładWspolrzednych(g);
+            NarysujWykres(g, KoloryWykresow[0]);
+        }
+        else{
+            WyliczWartosciDlaListyFunkcji();
+            NarysujUkładWspolrzednych(g);
+            for (int i=0; i<fc.getListaFunkcji().size();i++){
+                fl = fc.getListaFunkcji().get(i);
+                NarysujWykres(g, KoloryWykresow[i % 5]);
+            }
+        }
     }
 
-    private void NarysujWykres(Graphics g) {
-        g.setColor(Color.orange);
+    private void WyliczWartosciDlaListyFunkcji() {
+        if (fc.getListaFunkcji().size()==0){
+            dol = -1;
+            dolOpis = "-1";
+            gora = 1;
+            goraOpis = "1";
+            lewo = -1;
+            prawo = 1;
+            if (fc.getDziedzinaCzujnika().isDziedzinaCzyOdNiesk())
+                lewoOpis = "-∞";
+            else
+                lewoOpis = String.valueOf(fc.getDziedzinaCzujnika().getDziedzinaOdWart());
+            if (fc.getDziedzinaCzujnika().isDziedzinaCzyDoNiesk())
+                prawoOpis = "+∞";
+            else
+                prawoOpis = String.valueOf(fc.getDziedzinaCzujnika().getDziedzinaDoWart());
+        }else{
+            double min = MinimalnyXNaLiscieFunkcji();
+            double max = MaksymalnyXNaLiscieFunkcji();
+            if (min==max) {
+                lewo = min - 1;
+                prawo = max + 1;
+            }else {
+                lewo = min - (max - min) / 20;
+                prawo = max + (max - min) / 20;
+            }
+            if (fc.getDziedzinaCzujnika().isDziedzinaCzyOdNiesk())
+                lewoOpis = "-∞";
+            else
+                lewoOpis = String.valueOf(fc.getDziedzinaCzujnika().getDziedzinaOdWart());
+            if (fc.getDziedzinaCzujnika().isDziedzinaCzyDoNiesk())
+                prawoOpis = "+∞";
+            else
+                prawoOpis = String.valueOf(fc.getDziedzinaCzujnika().getDziedzinaDoWart());
+            min = MinimalnyYNaLiscieFunkcji();
+            max = MaksymalnyYNaLiscieFunkcji();
+            if (min==max){
+                gora = max + 0.5;
+                dol = min -0.5;
+            }
+            else {
+                gora = max;
+                dol =  min;
+            }
+            dolOpis = String.valueOf(dol);
+            goraOpis = String.valueOf(gora);
+        }
+    }
+
+    private double MaksymalnyYNaLiscieFunkcji() {
+        double result = 1;
+        if ((fc.getListaFunkcji().size()>0)&&(fc.getListaFunkcji().get(0).getPunkty().size()>0)) {
+            for (int i = 0; i < fc.getListaFunkcji().size(); i++)
+                for (int j = 0; j < fc.getListaFunkcji().get(i).getPunkty().size(); j++)
+                    if ((fc.getListaFunkcji().get(i).getPunkty().size()>0)&&(fc.getListaFunkcji().get(i).getPunkty().get(j).getY() > result))
+                        result = fc.getListaFunkcji().get(i).getPunkty().get(j).getY();
+        }
+        return result;
+    }
+
+    private double MinimalnyYNaLiscieFunkcji() {
+        double result = 0;
+        if ((fc.getListaFunkcji().size()>0)&&(fc.getListaFunkcji().get(0).getPunkty().size()>0)) {
+            for (int i = 0; i < fc.getListaFunkcji().size(); i++)
+                for (int j = 0; j < fc.getListaFunkcji().get(i).getPunkty().size(); j++)
+                    if ((fc.getListaFunkcji().get(i).getPunkty().size()>0)&&(fc.getListaFunkcji().get(i).getPunkty().get(j).getY() < result))
+                        result = fc.getListaFunkcji().get(i).getPunkty().get(j).getY();
+        }
+        return result;
+    }
+
+    private double MaksymalnyXNaLiscieFunkcji() {
+        double result;
+        if ((fc.getListaFunkcji().size()>0)&&(fc.getListaFunkcji().get(0).getPunkty().size()>0)) {
+            result = fc.getListaFunkcji().get(0).getPunkty().get(fc.getListaFunkcji().get(0).getPunkty().size() - 1).getX();
+            for (int i=0;i<fc.getListaFunkcji().size();i++)
+                if ((fc.getListaFunkcji().get(i).getPunkty().size()>0)&&(fc.getListaFunkcji().get(i).getPunkty().get(fc.getListaFunkcji().get(i).getPunkty().size()-1).getX()>result))
+                    result = fc.getListaFunkcji().get(i).getPunkty().get(fc.getListaFunkcji().get(i).getPunkty().size()-1).getX();
+        }
+        else
+            result=0;
+        return result;
+    }
+
+    private double MinimalnyXNaLiscieFunkcji() {
+        double result;
+        if ((fc.getListaFunkcji().size()>0)&&(fc.getListaFunkcji().get(0).getPunkty().size()>0)) {
+            result = fc.getListaFunkcji().get(0).getPunkty().get(0).getX();
+            for (int i = 0; i < fc.getListaFunkcji().size(); i++)
+                if ((fc.getListaFunkcji().get(i).getPunkty().size()>0)&&(fc.getListaFunkcji().get(i).getPunkty().get(0).getX() < result))
+                    result = fc.getListaFunkcji().get(i).getPunkty().get(0).getX();
+        }
+        else
+            result = 0;
+        return result;
+    }
+
+    private void NarysujWykres(Graphics g, Color col) {
+        if (fl.getNazwa().equals(PodswietNaCzerwono))
+            g.setColor(Color.RED);
+        else
+            g.setColor(col);
         Graphics2D g2 = (Graphics2D) g;
         Stroke tmpStroke = g2.getStroke();
         if (fl.getPunkty().size()==0)
@@ -62,7 +186,6 @@ public class WykresPanel extends JPanel {
     }
 
     private void WyliczWartosci() {
-        zapas = 20;
         if (fl.getPunkty().size()==0){
             dol = -1;
             dolOpis = "-1";
@@ -108,8 +231,8 @@ public class WykresPanel extends JPanel {
                 double max = WartoscMaksymalna();
                 double dystans = max - min;
                 if (dystans==0) {
-                    gora = fl.getPunkty().get(0).getY() + 1;
-                    dol =  fl.getPunkty().get(0).getY();
+                    gora = fl.getPunkty().get(0).getY() + 0.5;
+                    dol =  fl.getPunkty().get(0).getY() - 0.5;
                 }
                 else {
                     gora = max;
@@ -206,6 +329,13 @@ public class WykresPanel extends JPanel {
 
     public void ZaktualizujWartoscFunkcji(FunkcjaLiniowa fl){
         this.fl = fl;
+        ileFunkcji=1;
+        repaint();
+    }
+    public void ZaktualizujWartoscListyFunkcji(FunkcjaCzujnika funkcjaCzujnika, String s){
+        this.fc = funkcjaCzujnika;
+        PodswietNaCzerwono = s;
+        ileFunkcji=2;
         repaint();
     }
 }
