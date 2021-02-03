@@ -9,12 +9,9 @@ import java.awt.event.ActionListener;
 public class SilnikWindow extends JFrame {
     private JPanel mainPanel;
     private JTable table1;
-    private JButton wczytajZPlikuButton;
     private JButton cz1definiujButton;
     private JLabel czujnik1IcoLBL;
-    private JButton wczytajZPlikuButton1;
     private JButton cz2definiujButton;
-    private JButton wczytajZPlikuButton2;
     private JButton funcDefiniujButton;
     private JButton wczytajZPlikuButton3;
     private JButton zapiszDoPlikuButton;
@@ -61,26 +58,17 @@ public class SilnikWindow extends JFrame {
         setLocation(mw.getX()+mw.getWidth(),mw.getY()+y);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-        cz1definiujButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (fc[0] == null)
-                    fc[0] = new FunkcjeCzujnika(systemSterowania, SilnikWindow.this, ktorySilnik,0);
-                fc[0].setVisible(true);
-            }
+        cz1definiujButton.addActionListener(e -> {
+            if (fc[0] == null)
+                fc[0] = new FunkcjeCzujnika(systemSterowania, SilnikWindow.this, ktorySilnik,0);
+            fc[0].setVisible(true);
         });
-        cz2definiujButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (fc[1] == null)
-                    fc[1] = new FunkcjeCzujnika(systemSterowania, SilnikWindow.this, ktorySilnik,1);
-                fc[1].setVisible(true);
-            }
+        cz2definiujButton.addActionListener(e -> {
+            if (fc[1] == null)
+                fc[1] = new FunkcjeCzujnika(systemSterowania, SilnikWindow.this, ktorySilnik,1);
+            fc[1].setVisible(true);
         });
-        funcDefiniujButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-            }
+        funcDefiniujButton.addActionListener(e -> {
         });
     }
 

@@ -4,7 +4,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import java.awt.*;
+//import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 
@@ -15,8 +15,6 @@ import Project.SystemSterowania;
 public class PojedynczaFunkcja extends JFrame {
 
     private JTextField nazwaTF;
-    private JTextField fileNameTF;
-    private JButton zapiszButton;
     private JPanel mainPanel;
     private JTextField xTF;
     private JTextField yTF;
@@ -29,14 +27,14 @@ public class PojedynczaFunkcja extends JFrame {
     private JTable punktyTBL;
     private WykresPanel wykresPNL;
     private JLabel czujnikLBL;
-    private int FrameHeight = 500;
     String nazwafunkcji;
 
     public PojedynczaFunkcja(SystemSterowania systemSterowania, FunkcjeCzujnika fc, int ktorySilnik, int ktoryCzujnik, FunkcjaLiniowa fl){
         nazwafunkcji = fl.getNazwa();
         add(mainPanel);
+        int FrameHeight = 500;
         setSize(900,FrameHeight);
-        setLocation(fc.getX()+20,fc.getY()+20);
+        setLocation(fc.getX()+fc.getWidth(),fc.getY());
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         Object[] Kolumny = {"x", "y"};
@@ -44,9 +42,9 @@ public class PojedynczaFunkcja extends JFrame {
         dtm.setColumnIdentifiers(Kolumny);
         punktyTBL.setModel(dtm);
         punktyTBL.setAutoCreateRowSorter(true);
-        TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(punktyTBL.getModel());
+        TableRowSorter<TableModel> sorter = new TableRowSorter<>(punktyTBL.getModel());
         punktyTBL.setRowSorter(sorter);
-        ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
+        ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
         int columnIndexToSort = 0;
         sortKeys.add(new RowSorter.SortKey(columnIndexToSort, SortOrder.ASCENDING));
         sorter.setSortKeys(sortKeys);
@@ -55,34 +53,31 @@ public class PojedynczaFunkcja extends JFrame {
         InitComponents(systemSterowania,ktorySilnik, ktoryCzujnik, fc, fl, dtm);
         setVisible(true);
 
-        dodajBTN.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    int i = fl.Dodaj(new Punkt(Double.parseDouble(xTF.getText()), Double.parseDouble(yTF.getText())));
-                    switch (i) {
-                        case 0:
-                            KomunikatLBL.setText("Dodano punkt do funkcji");
-                            Object[] row = new Object[2];
-                            row[0] = xTF.getText();
-                            row[1] = yTF.getText();
-                            dtm.addRow(row);
-                            wykresPNL.ZaktualizujWartoscFunkcji(fl);
-                            fc.getWykresPNL().ZaktualizujWartoscListyFunkcji(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik),"");
-                            xTF.setText("");
-                            yTF.setText("");
-                            break;
-                        case 1:
-                            KomunikatLBL.setText("Nie dodano puntu. Jest już zdefiniowana wartość dla x = " + xTF.getText());
-                            break;
-                        case 2:
-                            KomunikatLBL.setText("Nie dodano puntu. Wartość x = " + xTF.getText() + " nie należy do dziedziny funkcji.");
-                            break;
-                    }
+        dodajBTN.addActionListener(e -> {
+            try {
+                int i = fl.Dodaj(new Punkt(Double.parseDouble(xTF.getText()), Double.parseDouble(yTF.getText())));
+                switch (i) {
+                    case 0:
+                        KomunikatLBL.setText("Dodano punkt do funkcji");
+                        Object[] row = new Object[2];
+                        row[0] = xTF.getText();
+                        row[1] = yTF.getText();
+                        dtm.addRow(row);
+                        wykresPNL.ZaktualizujWartoscFunkcji(fl);
+                        fc.getWykresPNL().ZaktualizujWartoscListyFunkcji(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik),"");
+                        xTF.setText("");
+                        yTF.setText("");
+                        break;
+                    case 1:
+                        KomunikatLBL.setText("Nie dodano puntu. Jest już zdefiniowana wartość dla x = " + xTF.getText());
+                        break;
+                    case 2:
+                        KomunikatLBL.setText("Nie dodano puntu. Wartość x = " + xTF.getText() + " nie należy do dziedziny funkcji.");
+                        break;
                 }
-                catch (Exception e1){
-                    KomunikatLBL.setText("Niepoprawna wartość zmiennej");
-                }
+            }
+            catch (Exception e1){
+                KomunikatLBL.setText("Niepoprawna wartość zmiennej");
             }
         });
         nazwaTF.addKeyListener(new KeyAdapter() {
@@ -90,7 +85,7 @@ public class PojedynczaFunkcja extends JFrame {
             public void keyReleased(KeyEvent e) {
                 super.keyReleased(e);
                 fl.setNazwa(nazwaTF.getText());
-                setTitles(fl.getNazwa());
+                //setTitles(fl.getNazwa());
                 fc.dm.setElementAt(nazwaTF.getText(), Pozycja(fc, nazwafunkcji));
                 nazwafunkcji = nazwaTF.getText();
             }
@@ -191,7 +186,12 @@ public class PojedynczaFunkcja extends JFrame {
     }
 
     private void InitComponents(SystemSterowania systemSterowania, int ktorySilnik, int ktoryCzujnik,FunkcjeCzujnika funkcjeCzujnika, FunkcjaLiniowa fl, DefaultTableModel dtm) {
-        setTitles(fl.getNazwa());
+// ustawianie tytułu
+        String s="Silnik: ";
+        s+= (ktorySilnik==0) ? "Prędkość, ":"Skręt, ";
+        s+= "zestaw funkcji: "+systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik).getNazwa();
+        setTitle(s);
+        mainPanel.setBorder(BorderFactory.createTitledBorder(s));
         dziedzinaLBL.setText(opsiDziedziny(fl));
         czujnikLBL.setText(funkcjeCzujnika.getCzujnikCMB().getSelectedItem().toString());
         nazwaTF.setText(fl.getNazwa());
@@ -205,11 +205,6 @@ public class PojedynczaFunkcja extends JFrame {
         wykresPNL.ZaktualizujWartoscFunkcji(fl);
         funkcjeCzujnika.getWykresPNL().ZaktualizujWartoscListyFunkcji(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik),"");
 
-    }
-
-    private void setTitles(String s) {
-        setTitle("Funkcja - "+s);
-        mainPanel.setBorder(BorderFactory.createTitledBorder("Funkcja - "+s));
     }
 
     private String opsiDziedziny(FunkcjaLiniowa fl) {

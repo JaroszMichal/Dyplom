@@ -49,8 +49,8 @@ public class WykresPanel extends JPanel {
 
     private void WyliczWartosciDlaListyFunkcji() {
         if (fc.getListaFunkcji().size()==0){
-            dol = -1;
-            dolOpis = "-1";
+            dol = 0;
+            dolOpis = "0";
             gora = 1;
             goraOpis = "1";
             lewo = -1;
@@ -67,10 +67,13 @@ public class WykresPanel extends JPanel {
             double min = MinimalnyXNaLiscieFunkcji();
             double max = MaksymalnyXNaLiscieFunkcji();
             if (min==max) {
-                lewo = min - 1;
+                if ((fc.getListaFunkcji().get(0).getPunkty().size()>0)&&(min==fc.getListaFunkcji().get(0).getPunkty().get(0).getX())&&(!fc.getDziedzinaCzujnika().isDziedzinaCzyOdNiesk()))
+                    lewo = Math.min(min,fc.getDziedzinaCzujnika().getDziedzinaOdWart());
+                else
+                    lewo = min - 1;
                 prawo = max + 1;
             }else {
-                lewo = min - (max - min) / 20;
+                lewo = min;
                 prawo = max + (max - min) / 20;
             }
             if (fc.getDziedzinaCzujnika().isDziedzinaCzyOdNiesk())
@@ -127,7 +130,7 @@ public class WykresPanel extends JPanel {
                     result = fc.getListaFunkcji().get(i).getPunkty().get(fc.getListaFunkcji().get(i).getPunkty().size()-1).getX();
         }
         else
-            result=0;
+            result=1;
         return result;
     }
 
@@ -187,8 +190,8 @@ public class WykresPanel extends JPanel {
 
     private void WyliczWartosci() {
         if (fl.getPunkty().size()==0){
-            dol = -1;
-            dolOpis = "-1";
+            dol = 0;
+            dolOpis = "0";
             gora = 1;
             goraOpis = "1";
             lewo = -1;
@@ -201,111 +204,67 @@ public class WykresPanel extends JPanel {
                 prawoOpis = "+∞";
             else
                 prawoOpis = String.valueOf(fl.getDziedzinaCzujnika().getDziedzinaDoWart());
-        }
-        else
-            if (fl.getPunkty().size()==1){
-                dol = fl.getPunkty().get(0).getY()-0.5;
-                gora = fl.getPunkty().get(0).getY()+0.5;
-                if (fl.getDziedzinaCzujnika().isDziedzinaCzyOdNiesk())
-                    lewo = fl.getPunkty().get(0).getX()-1;
+        }else{
+            double min = WartoscXMinimalna();
+            double max = WartoscXMaksymalna();
+            if (min==max) {
+                if ((min==fl.getPunkty().get(0).getX()) && (!fl.getDziedzinaCzujnika().isDziedzinaCzyOdNiesk()))
+                    lewo = Math.min(min,fl.getDziedzinaCzujnika().getDziedzinaOdWart());
                 else
-                    if (fl.getPunkty().get(0).getX()==fl.getDziedzinaCzujnika().getDziedzinaOdWart())
-                        lewo = fl.getPunkty().get(0).getX();
-                    else
-                        lewo = fl.getDziedzinaCzujnika().getDziedzinaOdWart();
-                if (fl.getDziedzinaCzujnika().isDziedzinaCzyDoNiesk())
-                    prawo = fl.getPunkty().get(0).getX()+1;
-                else
-                    if (fl.getPunkty().get(0).getX()==fl.getDziedzinaCzujnika().getDziedzinaDoWart())
-                        prawo = fl.getPunkty().get(0).getX();
-                    else
-                        prawo = fl.getDziedzinaCzujnika().getDziedzinaDoWart();
-                dolOpis = String.valueOf(dol);
-                goraOpis = String.valueOf(gora);
-                lewoOpis = String.valueOf(lewo);
-                prawoOpis = String.valueOf(prawo);
-
+                    lewo = min-1;
+                prawo = max + 1;
+            }else {
+                lewo = min;
+                prawo = max + (max - min) / 20;
             }
-            else {
-                double min = WartoscMinimalna();
-                double max = WartoscMaksymalna();
-                double dystans = max - min;
-                if (dystans==0) {
-                    gora = fl.getPunkty().get(0).getY() + 0.5;
-                    dol =  fl.getPunkty().get(0).getY() - 0.5;
-                }
-                else {
-                    gora = max;
-                    dol =  min;
-                }
-                dolOpis = String.valueOf(dol);
-                goraOpis = String.valueOf(gora);
-            }
-
-        if (fl.getPunkty().size()==0){
-            if (fl.getDziedzinaCzujnika().isDziedzinaCzyOdNiesk()) {
-                lewo = -1;
+            if (fl.getDziedzinaCzujnika().isDziedzinaCzyOdNiesk())
                 lewoOpis = "-∞";
-            } else {
-                lewo = fl.getDziedzinaCzujnika().getDziedzinaOdWart();
+            else
                 lewoOpis = String.valueOf(fl.getDziedzinaCzujnika().getDziedzinaOdWart());
-            }
-            if (fl.getDziedzinaCzujnika().isDziedzinaCzyDoNiesk()) {
-                prawo = 1;
+            if (fl.getDziedzinaCzujnika().isDziedzinaCzyDoNiesk())
                 prawoOpis = "+∞";
-            } else {
-                prawo = fl.getDziedzinaCzujnika().getDziedzinaDoWart();
+            else
                 prawoOpis = String.valueOf(fl.getDziedzinaCzujnika().getDziedzinaDoWart());
-            }
-        }
-        else
-            if (fl.getPunkty().size()==1){
-                lewo = fl.getPunkty().get(0).getX()-0.5;
-                prawo = fl.getPunkty().get(0).getX()+0.5;
-                if (fl.getDziedzinaCzujnika().isDziedzinaCzyOdNiesk()) {
-                    lewoOpis = "-∞";
-                } else {
-                    lewoOpis = String.valueOf(fl.getDziedzinaCzujnika().getDziedzinaOdWart());
-                }
-                if (fl.getDziedzinaCzujnika().isDziedzinaCzyDoNiesk()) {
-                    prawoOpis = "+∞";
-                } else {
-                    prawoOpis = String.valueOf(fl.getDziedzinaCzujnika().getDziedzinaDoWart());
-                }
+            min = WartoscYMinimalna();
+            max = WartoscYMaksymalna();
+            if (min==max){
+                gora = max + 0.5;
+                dol = min -0.5;
             }
             else {
-                double dystans = fl.getPunkty().get(fl.getPunkty().size()-1).getX() - fl.getPunkty().get(0).getX();
-                if (fl.getDziedzinaCzujnika().isDziedzinaCzyOdNiesk()) {
-                    lewo = fl.getPunkty().get(0).getX()-dystans/20;
-                    lewoOpis = "-∞";
-                } else {
-                    lewo = fl.getDziedzinaCzujnika().getDziedzinaOdWart();
-                    lewoOpis = String.valueOf(lewo);
-                }
-                if (fl.getDziedzinaCzujnika().isDziedzinaCzyDoNiesk()) {
-                    prawo = fl.getPunkty().get(fl.getPunkty().size()-1).getX()+dystans/20;
-                    prawoOpis = "+∞";
-                } else {
-                    prawo = fl.getDziedzinaCzujnika().getDziedzinaDoWart();
-                    lewoOpis = String.valueOf(prawo);
-                }
-                gora = WartoscMaksymalna();
-                goraOpis = String.valueOf(gora);
-                dol = WartoscMinimalna();
-                dolOpis = String.valueOf(dol);
+                gora = max;
+                dol =  min;
             }
+            dolOpis = String.valueOf(dol);
+            goraOpis = String.valueOf(gora);
+        }
     }
 
-    private double WartoscMinimalna() {
-        double result = fl.getPunkty().get(0).getY();
+    private double WartoscXMinimalna() {
+        double result = 0;
+        for (int i=1; i<fl.getPunkty().size();i++)
+            if (fl.getPunkty().get(i).getX()<result)
+                result =fl.getPunkty().get(i).getX();
+        return result;
+    }
+
+    private double WartoscXMaksymalna() {
+        double result = 1;
+        for (int i=1; i<fl.getPunkty().size();i++)
+            if (fl.getPunkty().get(i).getX()>result)
+                result =fl.getPunkty().get(i).getX();
+        return result;
+    }
+    private double WartoscYMinimalna() {
+        double result = 0;
         for (int i=1; i<fl.getPunkty().size();i++)
             if (fl.getPunkty().get(i).getY()<result)
                 result =fl.getPunkty().get(i).getY();
         return result;
     }
 
-    private double WartoscMaksymalna() {
-        double result = fl.getPunkty().get(0).getY();
+    private double WartoscYMaksymalna() {
+        double result = 1;
         for (int i=1; i<fl.getPunkty().size();i++)
             if (fl.getPunkty().get(i).getY()>result)
                 result =fl.getPunkty().get(i).getY();
