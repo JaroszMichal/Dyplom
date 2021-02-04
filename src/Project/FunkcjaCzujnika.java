@@ -1,9 +1,13 @@
 package Project;
 
+import Design.FunkcjeCzujnika;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
+import javax.swing.*;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,14 +72,25 @@ public class FunkcjaCzujnika {
             return false;
         }
     }
-    public String ZapiszFunkcjeCzujnikaDoPliku(String fileName){
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setInitialDirectory(new File("C:\\java"));
-        fileChooser.setTitle("Dupa");
-        fileChooser.setInitialFileName("test");
-        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("dupa blada", "*.dpa"));
-        File file = fileChooser.showSaveDialog();
 
-        return "Zapisano do pliku: "+fileName;
+    public boolean ZapiszDoPliku(File file){
+        try {
+            PrintWriter writer = new PrintWriter(file);
+            writer.println("nazwa:"+nazwa);
+            writer.println("czujnik:"+czujnik);
+            for (int i=0;i<listaFunkcji.size();i++) {
+                if (listaFunkcji.get(i).getPunkty().size()>0) {
+                    writer.print("funkcja:" + listaFunkcji.get(i).getNazwa());
+                    for (int j = 0; j < listaFunkcji.get(i).getPunkty().size(); j++)
+                        writer.print(":" + listaFunkcji.get(i).getPunkty().get(j).getX() + ":" + listaFunkcji.get(i).getPunkty().get(j).getY());
+                    writer.println("");
+                }
+            }
+            writer.close();
+            return true;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

@@ -62,14 +62,6 @@
                     <properties/>
                     <border type="none" title="Operacje na pliku"/>
                     <children>
-                      <component id="c1224" class="javax.swing.JTextField" binding="nazwaPlikuTF">
-                        <constraints>
-                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
-                            <preferred-size width="150" height="-1"/>
-                          </grid>
-                        </constraints>
-                        <properties/>
-                      </component>
                       <component id="5211c" class="javax.swing.JButton" binding="zapiszButton" default-binding="true">
                         <constraints>
                           <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
@@ -84,6 +76,18 @@
                         </constraints>
                         <properties>
                           <text value="Wczytaj"/>
+                        </properties>
+                      </component>
+                      <component id="5cb48" class="javax.swing.JLabel" binding="nazwaPlikuLBL">
+                        <constraints>
+                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false">
+                            <minimum-size width="100" height="-1"/>
+                          </grid>
+                        </constraints>
+                        <properties>
+                          <horizontalAlignment value="0"/>
+                          <horizontalTextPosition value="0"/>
+                          <text value=""/>
                         </properties>
                       </component>
                     </children>

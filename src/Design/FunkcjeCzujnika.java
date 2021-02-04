@@ -6,12 +6,12 @@ import Project.SystemSterowania;
 
 import javax.swing.*;
 import java.awt.event.*;
+import java.io.File;
 
 public class FunkcjeCzujnika extends JFrame{
     private JPanel mainPanel;
     private JTextField nazwaTF;
     private JComboBox czujnikCMB;
-    private JTextField nazwaPlikuTF;
     private JButton zapiszButton;
     private JButton wczytajButton;
     private JButton dodajButton;
@@ -21,12 +21,14 @@ public class FunkcjeCzujnika extends JFrame{
     private JButton usuńButton;
     private JButton wyczyscListeBTN;
     private JLabel komunikatLBL;
+    private String title;
 
     public WykresPanel getWykresPNL() {
         return wykresPNL;
     }
 
     private WykresPanel wykresPNL;
+    private JLabel nazwaPlikuLBL;
     private JLabel opisCzujnikaLBL;
     private int FrameHeight = 500;
     DefaultListModel dm = new DefaultListModel();
@@ -38,11 +40,11 @@ public class FunkcjeCzujnika extends JFrame{
     public FunkcjeCzujnika(SystemSterowania systemSterowania, SilnikWindow sw, int ktorySilnik, int ktoryCzujnik){
         add(mainPanel);
         setSize(800,FrameHeight);
-        String s="Silnik: ";
-        s += (ktorySilnik==0) ? "Prędkość" : "Skręt";
-        s += ", zestaw funkcji dla czujnika "+(ktoryCzujnik+1);
-        setTitle(s);
-        mainPanel.setBorder(BorderFactory.createTitledBorder(s));
+        title="Silnik: ";
+        title += (ktorySilnik==0) ? "Prędkość" : "Skręt";
+        title += ", zestaw funkcji dla czujnika "+(ktoryCzujnik+1);
+        setTitle(title);
+        mainPanel.setBorder(BorderFactory.createTitledBorder(title));
         UstawPolaFormularza(systemSterowania,ktorySilnik,ktoryCzujnik);
         setLocation(20,40);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -97,10 +99,33 @@ public class FunkcjeCzujnika extends JFrame{
                 wykresPNL.ZaktualizujWartoscListyFunkcji(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik), listaFunkcji.getSelectedValue().toString());
             }
         });
-        zapiszButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                komunikatLBL.setText(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik).ZapiszFunkcjeCzujnikaDoPliku(nazwaPlikuTF.getText()));
+
+        zapiszButton.addActionListener(e -> {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle(title);
+            int returnVal = fileChooser.showSaveDialog(FunkcjeCzujnika.this);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                File file = fileChooser.getSelectedFile();
+                if (systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik).ZapiszDoPliku(file)) {
+                    komunikatLBL.setText("Zapisano: " + file.getName() + ".");
+                    nazwaPlikuLBL.setText(file.getName());
+                }
+                else
+                    komunikatLBL.setText("Błąd zapisu do pliku: " + file.getName() + ".");
+            } else {
+                komunikatLBL.setText("Anulowano zapis do pliku.");
+            }
+        });
+
+        wczytajButton.addActionListener(e -> {
+            JFileChooser fileChooser = new JFileChooser();
+            int returnVal = fileChooser.showOpenDialog(FunkcjeCzujnika.this);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                File file = fileChooser.getSelectedFile();
+                //This is where a real application would open the file.
+                komunikatLBL.setText("Opening: " + file.getName() + ".");
+            } else {
+                komunikatLBL.setText("Open command cancelled by user.");
             }
         });
     }
