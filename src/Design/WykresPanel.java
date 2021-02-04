@@ -29,22 +29,25 @@ public class WykresPanel extends JPanel {
         this.ileFunkcji = ileFunkcji;
     }
 
-    //    @Override
+        @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        if (ileFunkcji==1) {
-            WyliczWartosci();
-            NarysujUkładWspolrzednych(g);
-            NarysujWykres(g, KoloryWykresow[0]);
-        }
-        else{
-            WyliczWartosciDlaListyFunkcji();
-            NarysujUkładWspolrzednych(g);
-            for (int i=0; i<fc.getListaFunkcji().size();i++){
-                fl = fc.getListaFunkcji().get(i);
-                NarysujWykres(g, KoloryWykresow[i % 5]);
+        try{
+            if (ileFunkcji<2) {
+                WyliczWartosci();
+                NarysujUkładWspolrzednych(g);
+                NarysujWykres(g, KoloryWykresow[0]);
+            }
+            else{
+                WyliczWartosciDlaListyFunkcji();
+                NarysujUkładWspolrzednych(g);
+                for (int i=0; i<fc.getListaFunkcji().size();i++){
+                    fl = fc.getListaFunkcji().get(i);
+                    NarysujWykres(g, KoloryWykresow[i % 5]);
+                }
             }
         }
+        catch(Exception e){}
     }
 
     private void WyliczWartosciDlaListyFunkcji() {
@@ -67,11 +70,19 @@ public class WykresPanel extends JPanel {
             double min = MinimalnyXNaLiscieFunkcji();
             double max = MaksymalnyXNaLiscieFunkcji();
             if (min==max) {
-                if ((fc.getListaFunkcji().get(0).getPunkty().size()>0)&&(min==fc.getListaFunkcji().get(0).getPunkty().get(0).getX())&&(!fc.getDziedzinaCzujnika().isDziedzinaCzyOdNiesk()))
-                    lewo = Math.min(min,fc.getDziedzinaCzujnika().getDziedzinaOdWart());
-                else
+                if ((fc.getListaFunkcji().get(0).getPunkty().size()>0)&&(min==fc.getListaFunkcji().get(0).getPunkty().get(0).getX())&&(!fc.getDziedzinaCzujnika().isDziedzinaCzyOdNiesk())) {
+                    if (min > fc.getDziedzinaCzujnika().getDziedzinaOdWart()) {
+                        lewo = fc.getDziedzinaCzujnika().getDziedzinaOdWart();
+                        prawo = max;
+                    }
+                    else{
+                        lewo = min;
+                        prawo = min+1;
+                    }
+                }else {
                     lewo = min - 1;
-                prawo = max + 1;
+                    prawo = max;
+                }
             }else {
                 lewo = min;
                 prawo = max + (max - min) / 20;

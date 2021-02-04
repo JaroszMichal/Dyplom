@@ -20,4 +20,16 @@ public class Czujniki {
             new DziedzinaCzujnika(false, 0, true,true,1,true),
             new DziedzinaCzujnika(true, -1, true,true,1,true),
     };
+    public String opisCzujnika(String nazwa){
+        for (int i=0;i<czujniki.length;i++)
+            if (czujniki[i].equals(nazwa))
+                return czujnikiOpis[i];
+        return "błędna nazwa czujnika";
+    }
+    public DziedzinaCzujnika dziedzinaCzujnika(String nazwa){
+        for (int i=0;i<czujniki.length;i++)
+            if (czujniki[i].equals(nazwa))
+                return dziedzinaCzujnikow[i];
+        return dziedzinaCzujnikow[0];
+    }
 }

@@ -13,12 +13,14 @@ public class SilnikWindow extends JFrame {
     private JLabel czujnik1IcoLBL;
     private JButton cz2definiujButton;
     private JButton funcDefiniujButton;
-    private JButton wczytajZPlikuButton3;
-    private JButton zapiszDoPlikuButton;
     private JTextField regulyNazwaTF;
     private JLabel f1nazwaTF;
     private JLabel f2nazwaTF;
     private JLabel f3nazwaTF;
+    private JButton wczytajZPlikuButton;
+    private JButton zapiszDoPlikuButton;
+    private JLabel isOkLBL;
+
     public FunkcjeCzujnika getFc(int i) {
         return fc[i];
     }

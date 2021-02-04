@@ -13,49 +13,20 @@ public class DziedzinaCzujnika {
     public boolean isDziedzinaCzyOdNiesk() {
         return dziedzinaCzyOdNiesk;
     }
-
-    public void setDziedzinaCzyOdNiesk(boolean dziedzinaCzyOdNiesk) {
-        this.dziedzinaCzyOdNiesk = dziedzinaCzyOdNiesk;
-    }
-
     public double getDziedzinaOdWart() {
         return dziedzinaOdWart;
     }
-
-    public void setDziedzinaOdWart(double dziedzinaOdWart) {
-        this.dziedzinaOdWart = dziedzinaOdWart;
-    }
-
     public boolean isDziedzinaOdCzyNalezy() {
         return dziedzinaOdCzyNalezy;
     }
-
-    public void setDziedzinaOdCzyNalezy(boolean dziedzinaOdCzyNalezy) {
-        this.dziedzinaOdCzyNalezy = dziedzinaOdCzyNalezy;
-    }
-
     public boolean isDziedzinaCzyDoNiesk() {
         return dziedzinaCzyDoNiesk;
     }
-
-    public void setDziedzinaCzyDoNiesk(boolean dziedzinaCzyDoNiesk) {
-        this.dziedzinaCzyDoNiesk = dziedzinaCzyDoNiesk;
-    }
-
     public double getDziedzinaDoWart() {
         return dziedzinaDoWart;
     }
-
-    public void setDziedzinaDoWart(double dziedzinaDoWart) {
-        this.dziedzinaDoWart = dziedzinaDoWart;
-    }
-
     public boolean isDziedzinaDoCzyNalezy() {
         return dziedzinaDoCzyNalezy;
-    }
-
-    public void setDziedzinaDoCzyNalezy(boolean dziedzinaDoCzyNalezy) {
-        this.dziedzinaDoCzyNalezy = dziedzinaDoCzyNalezy;
     }
 
     public DziedzinaCzujnika(boolean dziedzinaCzyOdNiesk, double dziedzinaOdWart, boolean dziedzinaOdCzyNalezy, boolean dziedzinaCzyDoNiesk, double dziedzinaDoWart, boolean dziedzinaDoCzyNalezy) {

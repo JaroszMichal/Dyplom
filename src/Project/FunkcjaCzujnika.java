@@ -1,14 +1,26 @@
 package Project;
 
+import javafx.stage.FileChooser;
+import javafx.stage.Window;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class FunkcjaCzujnika {
-    private String nazwa = "noname";
-    private String czujnik = Czujniki.czujniki[0];
-    private String opisCzujnika = Czujniki.czujnikiOpis[0];
-    private DziedzinaCzujnika dziedzinaCzujnika = Czujniki.dziedzinaCzujnikow[0];
-    private List<FunkcjaLiniowa> listaFunkcji = new ArrayList<FunkcjaLiniowa>();
+    private String nazwa;
+    private String czujnik;
+    private String opisCzujnika;
+    private DziedzinaCzujnika dziedzinaCzujnika;
+    private List<FunkcjaLiniowa> listaFunkcji;
+
+    public FunkcjaCzujnika(){
+        nazwa = "noname";
+        czujnik = Czujniki.czujniki[0];
+        opisCzujnika = Czujniki.czujnikiOpis[0];
+        dziedzinaCzujnika = Czujniki.dziedzinaCzujnikow[0];
+        listaFunkcji = new ArrayList<>();
+    }
 
     public String getNazwa() {
         return nazwa;
@@ -19,9 +31,6 @@ public class FunkcjaCzujnika {
     public String getCzujnik() {
         return czujnik;
     }
-    public void setCzujnik(String czujnik) {
-        this.czujnik = czujnik;
-    }
     public List<FunkcjaLiniowa> getListaFunkcji() {
         return listaFunkcji;
     }
@@ -31,22 +40,12 @@ public class FunkcjaCzujnika {
                 return listaFunkcji.get(i);
         return null;
     }
-    public void setListaFunkcji(List<FunkcjaLiniowa> listaFunkcji) {
-        this.listaFunkcji = listaFunkcji;
-    }
     public String getOpisCzujnika() {
         return opisCzujnika;
-    }
-    public void setOpisCzujnika(String opisCzujnika) {
-        this.opisCzujnika = opisCzujnika;
     }
     public DziedzinaCzujnika getDziedzinaCzujnika() {
         return dziedzinaCzujnika;
     }
-    public void setDziedzinaCzujnika(DziedzinaCzujnika dziedzinaCzujnika) {
-        this.dziedzinaCzujnika = dziedzinaCzujnika;
-    }
-
     public void ZmienCzujnik(String s){
         int i = PozycjaCzujnika(s);
         czujnik = Czujniki.czujniki[i];
@@ -59,9 +58,6 @@ public class FunkcjaCzujnika {
             if (Czujniki.czujniki[i].equals(s)) return i;
         return -1;
     }
-    public void DodajFunkcjeDoListy(FunkcjaLiniowa funkcjaLiniowa){
-        listaFunkcji.add(funkcjaLiniowa);
-    }
 
     public boolean UsunFunkcjeZListy(FunkcjaLiniowa funkcjaLiniowa){
         try {
@@ -72,8 +68,14 @@ public class FunkcjaCzujnika {
             return false;
         }
     }
+    public String ZapiszFunkcjeCzujnikaDoPliku(String fileName){
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialDirectory(new File("C:\\java"));
+        fileChooser.setTitle("Dupa");
+        fileChooser.setInitialFileName("test");
+        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("dupa blada", "*.dpa"));
+        File file = fileChooser.showSaveDialog();
 
-    public void WyczyscFunkcjeZListy() {
-        listaFunkcji.clear();
+        return "Zapisano do pliku: "+fileName;
     }
 }
