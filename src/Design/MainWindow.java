@@ -7,6 +7,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import static Project.Ikony.Green;
+import static Project.Ikony.Red;
+
 public class MainWindow extends JFrame {
     private JPanel mainPanel;
     private JButton trasaButton;
@@ -36,14 +39,6 @@ public class MainWindow extends JFrame {
 
     public void setTestLBL(String s) {
         this.testLBL.setText(s);
-    }
-
-    private ImageIcon Red(int size){
-        return new ImageIcon(new ImageIcon("resources\\red.png").getImage().getScaledInstance(size, size, Image.SCALE_DEFAULT));
-    }
-
-    private ImageIcon Green(int size){
-        return new ImageIcon(new ImageIcon("resources\\green.png").getImage().getScaledInstance(size, size, Image.SCALE_DEFAULT));
     }
 
     public MainWindow(){

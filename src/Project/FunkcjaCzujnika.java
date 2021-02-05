@@ -10,12 +10,18 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class FunkcjaCzujnika {
     private String nazwa;
     private String czujnik;
     private String opisCzujnika;
     private DziedzinaCzujnika dziedzinaCzujnika;
+
+    public void setListaFunkcji(List<FunkcjaLiniowa> listaFunkcji) {
+        this.listaFunkcji = listaFunkcji;
+    }
+
     private List<FunkcjaLiniowa> listaFunkcji;
 
     public FunkcjaCzujnika(){
@@ -87,6 +93,43 @@ public class FunkcjaCzujnika {
                 }
             }
             writer.close();
+            return true;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    public boolean WczytajzPliku(File file) {
+        try {
+            Scanner scanner =new Scanner(file);
+            String linia;
+            while (scanner.hasNext()){
+                linia = scanner.nextLine();
+                String[] podzielonaLinia = linia.split(":");
+                Punkt punkt;
+                FunkcjaLiniowa funkcjaLiniowa;
+                if (podzielonaLinia.length>0)
+                    switch (podzielonaLinia[0]){
+                        case "nazwa":
+                            this.nazwa = podzielonaLinia[1];
+                            break;
+                        case "czujnik":
+                            this.czujnik = podzielonaLinia[1];
+                            this.opisCzujnika = Czujniki.getOpisCzujnika(this.czujnik);
+                            this.dziedzinaCzujnika = Czujniki.getDziedzinaCzujnika(this.czujnik);
+                            break;
+                        case "funkcja":
+                            funkcjaLiniowa = new FunkcjaLiniowa();
+                            funkcjaLiniowa.setNazwa(podzielonaLinia[1]);
+                            funkcjaLiniowa.setDziedzinaCzujnika(this.dziedzinaCzujnika);
+                            for (int i=2;i<podzielonaLinia.length;i+=2) {
+                                punkt = new Punkt(Double.parseDouble(podzielonaLinia[i]), Double.parseDouble(podzielonaLinia[i + 1]));
+                                funkcjaLiniowa.getPunkty().add(punkt);
+                            }
+                            this.listaFunkcji.add(funkcjaLiniowa);
+                            break;
+                    }
+            }
             return true;
         } catch (FileNotFoundException e) {
             e.printStackTrace();

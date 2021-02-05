@@ -12,8 +12,9 @@ public class Silnik {
     }
     public Silnik()
     {
-        this.funkcjaCzujnika = new FunkcjaCzujnika[2];
+        this.funkcjaCzujnika = new FunkcjaCzujnika[3];
         this.funkcjaCzujnika[0] = new FunkcjaCzujnika();
         this.funkcjaCzujnika[1] = new FunkcjaCzujnika();
+        this.funkcjaCzujnika[2] = new FunkcjaCzujnika();
     }
 }

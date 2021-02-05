@@ -1,8 +1,10 @@
 package Design;
 
 import Project.Czujniki;
+import Project.FunkcjaCzujnika;
 import Project.FunkcjaLiniowa;
 import Project.SystemSterowania;
+import javafx.application.Application;
 
 import javax.swing.*;
 import java.awt.event.*;
@@ -22,7 +24,7 @@ public class FunkcjeCzujnika extends JFrame{
     private JButton wyczyscListeBTN;
     private JLabel komunikatLBL;
     private String title;
-
+    private boolean isListenerActive;
     public WykresPanel getWykresPNL() {
         return wykresPNL;
     }
@@ -40,6 +42,7 @@ public class FunkcjeCzujnika extends JFrame{
     public FunkcjeCzujnika(SystemSterowania systemSterowania, SilnikWindow sw, int ktorySilnik, int ktoryCzujnik){
         add(mainPanel);
         setSize(800,FrameHeight);
+        isListenerActive = true;
         title="Silnik: ";
         title += (ktorySilnik==0) ? "Prędkość" : "Skręt";
         title += ", zestaw funkcji dla czujnika "+(ktoryCzujnik+1);
@@ -52,6 +55,7 @@ public class FunkcjeCzujnika extends JFrame{
         dodajButton.addActionListener(e -> {
             FunkcjaLiniowa funkcjaLiniowa = new FunkcjaLiniowa(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik).getDziedzinaCzujnika());
             systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik).getListaFunkcji().add(funkcjaLiniowa);
+            sw.UstawPolaFormularza(systemSterowania, ktorySilnik);
             listaFunkcji.setModel(dm);
             dm.addElement(funkcjaLiniowa.getNazwa());
             PojedynczaFunkcja pf = new PojedynczaFunkcja(systemSterowania,  FunkcjeCzujnika.this, ktorySilnik, ktoryCzujnik, funkcjaLiniowa);
@@ -65,11 +69,14 @@ public class FunkcjeCzujnika extends JFrame{
             }
         });
         czujnikCMB.addActionListener(e -> {
-            WyczyscListe(systemSterowania, ktorySilnik, ktoryCzujnik);
-            systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik).ZmienCzujnik(czujnikCMB.getSelectedItem().toString());
-            czujnikCMB.setToolTipText(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik).getOpisCzujnika());
-            opisCzujnikaTextArea.setText(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik).getOpisCzujnika());
-            wykresPNL.ZaktualizujWartoscListyFunkcji(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik), "");
+            if (isListenerActive) {
+                WyczyscListe(systemSterowania, ktorySilnik, ktoryCzujnik);
+                sw.UstawPolaFormularza(systemSterowania, ktorySilnik);
+                systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik).ZmienCzujnik(czujnikCMB.getSelectedItem().toString());
+                czujnikCMB.setToolTipText(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik).getOpisCzujnika());
+                opisCzujnikaTextArea.setText(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik).getOpisCzujnika());
+                wykresPNL.ZaktualizujWartoscListyFunkcji(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik), "");
+            }
         });
         zmieńButton.addActionListener(e -> {
             try{
@@ -82,21 +89,27 @@ public class FunkcjeCzujnika extends JFrame{
             try {
                 if (systemSterowania.getSilnik(ktorySilnik).
                         getFunkcjaCzujnika(ktoryCzujnik).
-                        UsunFunkcjeZListy(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik).getFunkcja(listaFunkcji.getSelectedValue().toString())))
+                        UsunFunkcjeZListy(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik).getFunkcja(listaFunkcji.getSelectedValue().toString()))) {
                     dm.remove(IndeksNaLiscie(dm, listaFunkcji.getSelectedValue().toString()));
+                    sw.UstawPolaFormularza(systemSterowania, ktorySilnik);
+                }
                 wykresPNL.ZaktualizujWartoscListyFunkcji(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik), "");
             }
             catch (Exception e1){}
         });
         wyczyscListeBTN.addActionListener(e -> {
             WyczyscListe(systemSterowania, ktorySilnik, ktoryCzujnik);
+            sw.UstawPolaFormularza(systemSterowania, ktorySilnik);
             wykresPNL.ZaktualizujWartoscListyFunkcji(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik), "");
         });
         listaFunkcji.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-                wykresPNL.ZaktualizujWartoscListyFunkcji(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik), listaFunkcji.getSelectedValue().toString());
+                try {
+                    wykresPNL.ZaktualizujWartoscListyFunkcji(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik), listaFunkcji.getSelectedValue().toString());
+                }
+                catch (Exception e1){}
             }
         });
 
@@ -107,11 +120,11 @@ public class FunkcjeCzujnika extends JFrame{
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
                 if (systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik).ZapiszDoPliku(file)) {
-                    komunikatLBL.setText("Zapisano: " + file.getName() + ".");
+                    komunikatLBL.setText("Zapisano: " + file.getName());
                     nazwaPlikuLBL.setText(file.getName());
                 }
                 else
-                    komunikatLBL.setText("Błąd zapisu do pliku: " + file.getName() + ".");
+                    komunikatLBL.setText("Błąd zapisu do pliku: " + file.getName());
             } else {
                 komunikatLBL.setText("Anulowano zapis do pliku.");
             }
@@ -122,11 +135,19 @@ public class FunkcjeCzujnika extends JFrame{
             int returnVal = fileChooser.showOpenDialog(FunkcjeCzujnika.this);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
-                //This is where a real application would open the file.
-                komunikatLBL.setText("Opening: " + file.getName() + ".");
+                if (systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik).WczytajzPliku(file)) {
+                    komunikatLBL.setText("Wczytano dane z pliku: " + file.getName());
+                    nazwaPlikuLBL.setText(file.getName());
+                    sw.UstawPolaFormularza(systemSterowania, ktorySilnik);
+                    OdswiezPolaFormularza(systemSterowania,ktorySilnik,ktoryCzujnik);
+                }
+                else
+                    komunikatLBL.setText("Błąd odczytu z pliku: " + file.getName());
             } else {
-                komunikatLBL.setText("Open command cancelled by user.");
+                komunikatLBL.setText("Anulowano odczyt z pliku.");
             }
+        });
+        czujnikCMB.addComponentListener(new ComponentAdapter() {
         });
     }
 
@@ -145,10 +166,23 @@ public class FunkcjeCzujnika extends JFrame{
         nazwaTF.setText(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik).getNazwa());
         for (String s: Czujniki.czujniki )
             czujnikCMB.addItem(s);
-        czujnikCMB.setSelectedItem(systemSterowania.getSilnik(ktoryCzujnik).getFunkcjaCzujnika(ktoryCzujnik).getCzujnik());
-        czujnikCMB.setToolTipText(systemSterowania.getSilnik(ktoryCzujnik).getFunkcjaCzujnika(ktoryCzujnik).getOpisCzujnika());
-        opisCzujnikaTextArea.setText(systemSterowania.getSilnik(ktoryCzujnik).getFunkcjaCzujnika(ktoryCzujnik).getOpisCzujnika());
+        czujnikCMB.setSelectedItem(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik).getCzujnik());
+        czujnikCMB.setToolTipText(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik).getOpisCzujnika());
+        opisCzujnikaTextArea.setText(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik).getOpisCzujnika());
         opisCzujnikaTextArea.setLineWrap(true);
+        wykresPNL.ZaktualizujWartoscListyFunkcji(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik), "");
+    }
+    private void OdswiezPolaFormularza(SystemSterowania systemSterowania, int ktorySilnik, int ktoryCzujnik) {
+        nazwaTF.setText(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik).getNazwa());
+        isListenerActive = false;
+        czujnikCMB.setSelectedItem(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik).getCzujnik());
+        isListenerActive = true;
+        czujnikCMB.setToolTipText(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik).getOpisCzujnika());
+        opisCzujnikaTextArea.setText(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik).getOpisCzujnika());
+        opisCzujnikaTextArea.setLineWrap(true);
+        listaFunkcji.setModel(dm);
+        for (int i=0; i<systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik).getListaFunkcji().size();i++)
+            dm.addElement(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik).getListaFunkcji().get(i).getNazwa());
         wykresPNL.ZaktualizujWartoscListyFunkcji(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(ktoryCzujnik), "");
     }
 }
