@@ -5,6 +5,7 @@ import Project.SystemSterowania;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -13,7 +14,6 @@ import static Project.Ikony.Red;
 
 public class SilnikWindow extends JFrame {
     private JPanel mainPanel;
-    private JTable table1;
     private JButton cz1definiujButton;
     private JLabel czujnik1IcoLBL;
     private JButton cz2definiujButton;
@@ -28,6 +28,7 @@ public class SilnikWindow extends JFrame {
     private JLabel czujnik2IcoLBL;
     private JLabel czujnik3IcoLBL;
     private JPanel funkcjaPNL;
+    private MojaTabela mojaTabela1;
 
     public FunkcjeCzujnika getFc(int i) {
         return fc[i];
@@ -79,11 +80,17 @@ public class SilnikWindow extends JFrame {
             fc[1].setVisible(true);
         });
         funcDefiniujButton.addActionListener(e -> {
+            if (fc[2] == null)
+                fc[2] = new FunkcjeCzujnika(systemSterowania, SilnikWindow.this, ktorySilnik,2);
+            fc[2].setVisible(true);
         });
     }
 
     public void UstawPolaFormularza(SystemSterowania systemSterowania, int ktorySilnik) {
-        funkcjaPNL.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Funkcja przyśpieszenia", TitledBorder.LEFT, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 0, 12)));
+        if (ktorySilnik==0)
+            funkcjaPNL.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Funkcja przyśpieszenia", TitledBorder.LEFT, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 0, 12)));
+        else
+            funkcjaPNL.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Funkcja skrętu", TitledBorder.LEFT, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 0, 12)));
         f1nazwaTF.setText(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(0).getCzujnik()+" - "+systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(0).getNazwa());
         f2nazwaTF.setText(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(1).getCzujnik()+" - "+systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(1).getNazwa());
         if (systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(0).getListaFunkcji().size()>0)

@@ -41,9 +41,19 @@ public class WykresPanel extends JPanel {
             else{
                 WyliczWartosciDlaListyFunkcji();
                 NarysujUkładWspolrzednych(g);
-                for (int i=0; i<fc.getListaFunkcji().size();i++){
+                FunkcjaLiniowa fl1 = new FunkcjaLiniowa();
+                boolean isPodswietlony = false;
+                for (int i=0; i<fc.getListaFunkcji().size();i++) {
                     fl = fc.getListaFunkcji().get(i);
-                    NarysujWykres(g, KoloryWykresow[i % 5]);
+                    if (fl.getNazwa().equals(PodswietNaCzerwono)) {
+                        fl1 = fl;
+                        isPodswietlony = true;
+                    } else
+                        NarysujWykres(g, KoloryWykresow[i % 5]);
+                }
+                if (isPodswietlony){
+                    fl = fl1;
+                    NarysujWykres(g, KoloryWykresow[0]);
                 }
             }
         }

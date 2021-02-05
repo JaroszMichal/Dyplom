@@ -8,6 +8,7 @@ import javax.swing.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -17,26 +18,22 @@ public class FunkcjaCzujnika {
     private String czujnik;
     private String opisCzujnika;
     private DziedzinaCzujnika dziedzinaCzujnika;
-
-    public void setListaFunkcji(List<FunkcjaLiniowa> listaFunkcji) {
-        this.listaFunkcji = listaFunkcji;
-    }
-
     private List<FunkcjaLiniowa> listaFunkcji;
 
-    public FunkcjaCzujnika(){
-        nazwa = "noname";
-        czujnik = Czujniki.czujniki[0];
-        opisCzujnika = Czujniki.czujnikiOpis[0];
-        dziedzinaCzujnika = Czujniki.dziedzinaCzujnikow[0];
-        listaFunkcji = new ArrayList<>();
+    public void setDziedzinaCzujnika(DziedzinaCzujnika dziedzinaCzujnika) {
+        this.dziedzinaCzujnika = dziedzinaCzujnika;
     }
-
     public String getNazwa() {
         return nazwa;
     }
     public void setNazwa(String nazwa) {
         this.nazwa = nazwa;
+    }
+    public void setCzujnik(String czujnik) {
+        this.czujnik = czujnik;
+    }
+    public void setOpisCzujnika(String opisCzujnika) {
+        this.opisCzujnika = opisCzujnika;
     }
     public String getCzujnik() {
         return czujnik;
@@ -56,6 +53,15 @@ public class FunkcjaCzujnika {
     public DziedzinaCzujnika getDziedzinaCzujnika() {
         return dziedzinaCzujnika;
     }
+
+    public FunkcjaCzujnika(){
+        nazwa = "noname";
+        czujnik = Czujniki.czujniki[0];
+        opisCzujnika = Czujniki.czujnikiOpis[0];
+        dziedzinaCzujnika = Czujniki.dziedzinaCzujnikow[0];
+        listaFunkcji = new ArrayList<>();
+    }
+
     public void ZmienCzujnik(String s){
         int i = PozycjaCzujnika(s);
         czujnik = Czujniki.czujniki[i];
@@ -99,7 +105,8 @@ public class FunkcjaCzujnika {
             return false;
         }
     }
-    public boolean WczytajzPliku(File file) {
+    public int WczytajzPliku(File file) {
+        int result = 0;
         try {
             Scanner scanner =new Scanner(file);
             String linia;
@@ -127,13 +134,14 @@ public class FunkcjaCzujnika {
                                 funkcjaLiniowa.getPunkty().add(punkt);
                             }
                             this.listaFunkcji.add(funkcjaLiniowa);
+                            result++;
                             break;
                     }
             }
-            return true;
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            return false;
+            result = -1;
         }
+        return result;
     }
 }

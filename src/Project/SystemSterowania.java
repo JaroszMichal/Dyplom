@@ -30,8 +30,8 @@ public class SystemSterowania {
         trasa = new Trasa();
         auto = new Auto();
         silnik = new Silnik[2];
-        silnik[0] = new Silnik();
-        silnik[1] = new Silnik();
+        silnik[0] = new Silnik(0);
+        silnik[1] = new Silnik(1);
     }
 
 }
