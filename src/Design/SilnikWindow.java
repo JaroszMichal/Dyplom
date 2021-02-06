@@ -5,9 +5,14 @@ import Project.SystemSterowania;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import static Project.Ikony.Green;
 import static Project.Ikony.Red;
@@ -28,7 +33,7 @@ public class SilnikWindow extends JFrame {
     private JLabel czujnik2IcoLBL;
     private JLabel czujnik3IcoLBL;
     private JPanel funkcjaPNL;
-    private MojaTabela mojaTabela1;
+    private JTable regulyTBL;
 
     public FunkcjeCzujnika getFc(int i) {
         return fc[i];
@@ -105,5 +110,15 @@ public class SilnikWindow extends JFrame {
             czujnik3IcoLBL.setIcon(Green(30));
         else
             czujnik3IcoLBL.setIcon(Red(30));
+        Object[] Kolumny = {"", "y", "z", "q", "w", "e"};
+        DefaultTableModel dtm = new DefaultTableModel();
+        dtm.setColumnIdentifiers(Kolumny);
+        regulyTBL.setModel(dtm);
+        for (int i=0;i<6;i++) {
+            Object[] wiersz = {"a", "b", "c", "d", "e", "f"};
+            dtm.addRow(wiersz);
+        }
+        regulyTBL.getColumnModel().getColumn(0).setCellRenderer(new RowHeaderRenderer());
+        regulyTBL.getTableHeader().resizeAndRepaint();
     }
 }
