@@ -15,10 +15,14 @@ class RowHeaderRenderer extends DefaultTableCellRenderer {
                                                    int column) {
         if (table != null) {
             JTableHeader header = table.getTableHeader();
+            //setOpaque(true);
+            //setBorder(UIManager.getBorder("TableHeader.cellBorder"));
 
             if (header != null) {
-                setForeground(header.getForeground());
-                setBackground(header.getBackground());
+                setForeground(Color.black);
+                //setForeground(header.getForeground());
+                //setBackground(header.getBackground());
+                setBackground(Color.white);
                 setFont(header.getFont());
             }
         }

@@ -107,6 +107,7 @@ public class FunkcjaCzujnika {
     }
     public int WczytajzPliku(File file) {
         int result = 0;
+        listaFunkcji.clear();
         try {
             Scanner scanner =new Scanner(file);
             String linia;

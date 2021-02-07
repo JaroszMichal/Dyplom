@@ -1,5 +1,6 @@
 package Design;
 
+import Project.SpolszczenieJFileChooser;
 import Project.SystemSterowania;
 
 import javax.swing.*;
@@ -12,6 +13,9 @@ import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputMethodEvent;
+import java.awt.event.InputMethodListener;
+import java.io.File;
 import java.util.ArrayList;
 
 import static Project.Ikony.Green;
@@ -23,23 +27,22 @@ public class SilnikWindow extends JFrame {
     private JLabel czujnik1IcoLBL;
     private JButton cz2definiujButton;
     private JButton funcDefiniujButton;
-    private JTextField regulyNazwaTF;
     private JLabel f1nazwaTF;
     private JLabel f2nazwaTF;
     private JLabel f3nazwaTF;
     private JButton wczytajZPlikuButton;
     private JButton zapiszDoPlikuButton;
-    private JLabel isOkLBL;
+    private JLabel komunikatLBL;
     private JLabel czujnik2IcoLBL;
     private JLabel czujnik3IcoLBL;
     private JPanel funkcjaPNL;
     private JTable regulyTBL;
-
+    private JLabel nazwaPlikuLBL;
+    private final FunkcjeCzujnika[] fc = {null, null, null};
+    private String title;
     public FunkcjeCzujnika getFc(int i) {
         return fc[i];
     }
-    private final FunkcjeCzujnika[] fc = {null, null, null};
-
     public void setF1nazwaTF(String s) {
         this.f1nazwaTF.setText(s);
     }
@@ -54,7 +57,7 @@ public class SilnikWindow extends JFrame {
     public SilnikWindow(SystemSterowania systemSterowania, MainWindow mw, int ktorySilnik) {
         add(mainPanel);
         setSize(600,400);
-        String title="";
+        title="";
         int y=0;
         switch (ktorySilnik){
             case 0:
@@ -89,6 +92,26 @@ public class SilnikWindow extends JFrame {
                 fc[2] = new FunkcjeCzujnika(systemSterowania, SilnikWindow.this, ktorySilnik,2);
             fc[2].setVisible(true);
         });
+        zapiszDoPlikuButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fileChooser = new JFileChooser();
+                SpolszczenieJFileChooser.PL(fileChooser);
+                fileChooser.setDialogTitle(title);
+                int returnVal = fileChooser.showSaveDialog(SilnikWindow.this);
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    File file = fileChooser.getSelectedFile();
+                    if (systemSterowania.getSilnik(ktorySilnik).ZapiszDoPliku(file)) {
+                        komunikatLBL.setText("Zapisano: " + file.getName());
+                        nazwaPlikuLBL.setText(file.getName());
+                    }
+                    else
+                        komunikatLBL.setText("Błąd zapisu do pliku: " + file.getName());
+                } else {
+                    komunikatLBL.setText("Anulowano zapis do pliku.");
+                }
+            }
+        });
     }
 
     public void UstawPolaFormularza(SystemSterowania systemSterowania, int ktorySilnik) {
@@ -110,15 +133,67 @@ public class SilnikWindow extends JFrame {
             czujnik3IcoLBL.setIcon(Green(30));
         else
             czujnik3IcoLBL.setIcon(Red(30));
-        Object[] Kolumny = {"", "y", "z", "q", "w", "e"};
-        DefaultTableModel dtm = new DefaultTableModel();
-        dtm.setColumnIdentifiers(Kolumny);
-        regulyTBL.setModel(dtm);
-        for (int i=0;i<6;i++) {
-            Object[] wiersz = {"a", "b", "c", "d", "e", "f"};
-            dtm.addRow(wiersz);
+
+        String[] Kolumny = new String[1+systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(1).getListaFunkcji().size()];
+        if (Kolumny.length>1) {
+            Kolumny[0] = "";
+            for (int i = 0; i < Kolumny.length-1; i++)
+                Kolumny[i + 1] = systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(1).getListaFunkcji().get(i).getNazwa();
+            DefaultTableModel dtm = new DefaultTableModel();
+            dtm.setColumnIdentifiers(Kolumny);
+            regulyTBL.setModel(dtm);
+            String[] wiersz = new String[Kolumny.length];
+            for (int i = 0; i < systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(0).getListaFunkcji().size(); i++) {
+                wiersz[0] = systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(0).getListaFunkcji().get(i).getNazwa();
+                for (int j=1; j<Kolumny.length;j++)
+                    wiersz[j] = "Ustal...";
+                dtm.addRow(wiersz);
+            }
+            if (systemSterowania.getSilnik(ktorySilnik).getRegulywnioskowania()==null)
+                systemSterowania.getSilnik(ktorySilnik).setRegulywnioskowania(new int[systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(0).getListaFunkcji().size()][systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(1).getListaFunkcji().size()]);
+            int regWn0 = systemSterowania.getSilnik(ktorySilnik).getRegulywnioskowania().length;
+            int silF0Length = systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(0).getListaFunkcji().size();
+            int regWn1 = systemSterowania.getSilnik(ktorySilnik).getRegulywnioskowania()[0].length;
+            int silF1Leng= systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(1).getListaFunkcji().size();
+            if ((regWn0!=silF0Length) || (regWn1!=silF1Leng))
+                    systemSterowania.getSilnik(ktorySilnik).setRegulywnioskowania(new int[systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(0).getListaFunkcji().size()][systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(1).getListaFunkcji().size()]);
+            String[] reguly = new String[systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(2).getListaFunkcji().size()];
+            for (int i=0;i<systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(2).getListaFunkcji().size();i++)
+                reguly[i] = systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(2).getListaFunkcji().get(i).getNazwa();
+            if (reguly.length>0)
+                for (int i = 0; i < systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(0).getListaFunkcji().size(); i++) {
+                    for (int j=1; j<Kolumny.length;j++)
+                        regulyTBL.setValueAt(reguly[0],i,j);
+            }
+            JComboBox cb = new JComboBox(reguly);
+            final int[] lastRow = {-1};
+            final int[] lastCol = {-1};
+            cb.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+//                if (systemSterowania.getSilnik(ktorySilnik).getRegulywnioskowania()!=null)
+//                    JOptionPane.showMessageDialog(null, "Row = "+regulyTBL.getSelectedRow()+
+//                            ", col = "+(regulyTBL.getSelectedColumn()-1)+"value = "+cb.getSelectedIndex());
+                    if ((regulyTBL.getSelectedRow()>-1)&&(regulyTBL.getSelectedColumn()>-1)&&(regulyTBL.getSelectedRow()!= lastRow[0])&&(regulyTBL.getSelectedColumn()!= lastCol[0])) {
+                        systemSterowania.getSilnik(ktorySilnik).getRegulywnioskowania()[regulyTBL.getSelectedRow()][regulyTBL.getSelectedColumn() - 1] = cb.getSelectedIndex();
+                        lastRow[0] = regulyTBL.getSelectedRow();
+                        lastCol[0] = regulyTBL.getSelectedColumn();
+                    }
+                    else{
+                        lastRow[0] = -1;
+                        lastCol[0] = -1;
+                    }
+                }
+            });
+            for (int i=1; i<Kolumny.length;i++)
+                regulyTBL.getColumnModel().getColumn(i).setCellEditor(new DefaultCellEditor(cb));
+            regulyTBL.getColumnModel().getColumn(0).setCellRenderer(new RowHeaderRenderer());
+            regulyTBL.getTableHeader().resizeAndRepaint();
         }
-        regulyTBL.getColumnModel().getColumn(0).setCellRenderer(new RowHeaderRenderer());
-        regulyTBL.getTableHeader().resizeAndRepaint();
+//        JTableHeader naglowekTabeli = regulyTBL.getTableHeader();
+//        naglowekTabeli.setBackground(Color.WHITE);
+//        naglowekTabeli.setForeground(Color.BLACK);
+
+
     }
 }
