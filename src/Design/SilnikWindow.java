@@ -73,23 +73,23 @@ public class SilnikWindow extends JFrame {
         }
         setTitle("Definiowanie silnika - "+title);
         mainPanel.setBorder(BorderFactory.createTitledBorder(title));
-        UstawPolaFormularza(systemSterowania, ktorySilnik);
+        UstawPolaFormularza(systemSterowania, mw, ktorySilnik);
         setLocation(mw.getX()+mw.getWidth(),mw.getY()+y);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         cz1definiujButton.addActionListener(e -> {
             if (fc[0] == null)
-                fc[0] = new FunkcjeCzujnika(systemSterowania, SilnikWindow.this, ktorySilnik,0);
+                fc[0] = new FunkcjeCzujnika(systemSterowania, mw, SilnikWindow.this, ktorySilnik,0);
             fc[0].setVisible(true);
         });
         cz2definiujButton.addActionListener(e -> {
             if (fc[1] == null)
-                fc[1] = new FunkcjeCzujnika(systemSterowania, SilnikWindow.this, ktorySilnik,1);
+                fc[1] = new FunkcjeCzujnika(systemSterowania, mw, SilnikWindow.this, ktorySilnik,1);
             fc[1].setVisible(true);
         });
         funcDefiniujButton.addActionListener(e -> {
             if (fc[2] == null)
-                fc[2] = new FunkcjeCzujnika(systemSterowania, SilnikWindow.this, ktorySilnik,2);
+                fc[2] = new FunkcjeCzujnika(systemSterowania, mw, SilnikWindow.this, ktorySilnik,2);
             fc[2].setVisible(true);
         });
         zapiszDoPlikuButton.addActionListener(new ActionListener() {
@@ -112,9 +112,36 @@ public class SilnikWindow extends JFrame {
                 }
             }
         });
+        wczytajZPlikuButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fileChooser = new JFileChooser();
+                SpolszczenieJFileChooser.PL(fileChooser);
+                int returnVal = fileChooser.showOpenDialog(SilnikWindow.this);
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    File file = fileChooser.getSelectedFile();
+                    returnVal = systemSterowania.getSilnik(ktorySilnik).WczytajzPliku(file);
+                    switch (returnVal){
+                        case 0:
+                            komunikatLBL.setText("Plik: " + file.getName() + " nie zawiera prawidłowej definicji silnika.");
+                            break;
+                        case -1:
+                            komunikatLBL.setText("Błąd odczytu z pliku: " + file.getName());
+                            break;
+                        default:
+                            komunikatLBL.setText("Wczytano dane z pliku: " + file.getName());
+                            nazwaPlikuLBL.setText(file.getName());
+                            UstawPolaFormularza(systemSterowania, mw, ktorySilnik);
+                            break;
+
+                    }
+                } else
+                    komunikatLBL.setText("Anulowano odczyt z pliku.");
+            }
+        });
     }
 
-    public void UstawPolaFormularza(SystemSterowania systemSterowania, int ktorySilnik) {
+    public void UstawPolaFormularza(SystemSterowania systemSterowania, MainWindow mw, int ktorySilnik) {
         if (ktorySilnik==0)
             funkcjaPNL.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Funkcja przyśpieszenia", TitledBorder.LEFT, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 0, 12)));
         else
@@ -133,7 +160,6 @@ public class SilnikWindow extends JFrame {
             czujnik3IcoLBL.setIcon(Green(30));
         else
             czujnik3IcoLBL.setIcon(Red(30));
-
         String[] Kolumny = new String[1+systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(1).getListaFunkcji().size()];
         if (Kolumny.length>1) {
             Kolumny[0] = "";
@@ -160,20 +186,18 @@ public class SilnikWindow extends JFrame {
             String[] reguly = new String[systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(2).getListaFunkcji().size()];
             for (int i=0;i<systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(2).getListaFunkcji().size();i++)
                 reguly[i] = systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(2).getListaFunkcji().get(i).getNazwa();
+            JComboBox cb = new JComboBox(reguly);
             if (reguly.length>0)
                 for (int i = 0; i < systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(0).getListaFunkcji().size(); i++) {
                     for (int j=1; j<Kolumny.length;j++)
-                        regulyTBL.setValueAt(reguly[0],i,j);
+//                        regulyTBL.setValueAt(systemSterowania.getSilnik(ktorySilnik).getRegulywnioskowania()[i][j-1],i,j);
+                        regulyTBL.setValueAt(cb.getItemAt(systemSterowania.getSilnik(ktorySilnik).getRegulywnioskowania()[i][j-1]),i,j);
             }
-            JComboBox cb = new JComboBox(reguly);
             final int[] lastRow = {-1};
             final int[] lastCol = {-1};
             cb.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-//                if (systemSterowania.getSilnik(ktorySilnik).getRegulywnioskowania()!=null)
-//                    JOptionPane.showMessageDialog(null, "Row = "+regulyTBL.getSelectedRow()+
-//                            ", col = "+(regulyTBL.getSelectedColumn()-1)+"value = "+cb.getSelectedIndex());
                     if ((regulyTBL.getSelectedRow()>-1)&&(regulyTBL.getSelectedColumn()>-1)&&(regulyTBL.getSelectedRow()!= lastRow[0])&&(regulyTBL.getSelectedColumn()!= lastCol[0])) {
                         systemSterowania.getSilnik(ktorySilnik).getRegulywnioskowania()[regulyTBL.getSelectedRow()][regulyTBL.getSelectedColumn() - 1] = cb.getSelectedIndex();
                         lastRow[0] = regulyTBL.getSelectedRow();
@@ -190,10 +214,10 @@ public class SilnikWindow extends JFrame {
             regulyTBL.getColumnModel().getColumn(0).setCellRenderer(new RowHeaderRenderer());
             regulyTBL.getTableHeader().resizeAndRepaint();
         }
-//        JTableHeader naglowekTabeli = regulyTBL.getTableHeader();
-//        naglowekTabeli.setBackground(Color.WHITE);
-//        naglowekTabeli.setForeground(Color.BLACK);
-
-
+        else{
+            DefaultTableModel dtm = new DefaultTableModel();
+            regulyTBL.setModel(dtm);
+        }
+        mw.UstawPolaFormularza();
     }
 }

@@ -29,7 +29,7 @@ public class PojedynczaFunkcja extends JFrame {
     private JLabel czujnikLBL;
     String nazwafunkcji;
 
-    public PojedynczaFunkcja(SystemSterowania systemSterowania, FunkcjeCzujnika fc, int ktorySilnik, int ktoryCzujnik, FunkcjaLiniowa fl){
+    public PojedynczaFunkcja(SystemSterowania systemSterowania, MainWindow mw,SilnikWindow sw, FunkcjeCzujnika fc, int ktorySilnik, int ktoryCzujnik, FunkcjaLiniowa fl){
         nazwafunkcji = fl.getNazwa();
         add(mainPanel);
         int FrameHeight = 500;
@@ -87,6 +87,7 @@ public class PojedynczaFunkcja extends JFrame {
                 fl.setNazwa(nazwaTF.getText());
                 //setTitles(fl.getNazwa());
                 fc.dm.setElementAt(nazwaTF.getText(), Pozycja(fc, nazwafunkcji));
+                sw.UstawPolaFormularza(systemSterowania,mw, ktorySilnik);
                 nazwafunkcji = nazwaTF.getText();
             }
         });

@@ -1,10 +1,17 @@
 package Project;
 
 public class Trasa {
-    private int cos;
+    private String nazwa;
+
+    public String getNazwa() {
+        return nazwa;
+    }
+    public void setNazwa(String nazwa) {
+        this.nazwa = nazwa;
+    }
 
     public Trasa(){
-        cos = 0;
+        nazwa = "Route 66";
     }
 
 }

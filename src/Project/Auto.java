@@ -5,7 +5,7 @@ public class Auto {
     private float predkoscMaksymalna;
     private float czasOsiagnieciaPredkosciMaksymalnej;
     private float czasWyhamowaniazPredkosciMaksymalnej;
-    private float maksymalnyPromienSkretu;
+    private float maksymalnyKatSkretu;
 
     public float getPredkoscMaksymalna() {
         return predkoscMaksymalna;
@@ -25,11 +25,17 @@ public class Auto {
     public void setCzasWyhamowaniazPredkosciMaksymalnej(float czasWyhamowaniazPredkosciMaksymalnej) {
         this.czasWyhamowaniazPredkosciMaksymalnej = czasWyhamowaniazPredkosciMaksymalnej;
     }
-    public float getMaksymalnyPromienSkretu() {
-        return maksymalnyPromienSkretu;
+    public float getMaksymalnyKatSkretu() {
+        return maksymalnyKatSkretu;
     }
-    public void setMaksymalnyPromienSkretu(float maksymalnyPromienSkretu) {
-        this.maksymalnyPromienSkretu = maksymalnyPromienSkretu;
+    public void setMaksymalnyKatSkretu(float maksymalnyKatSkretu) {
+        this.maksymalnyKatSkretu = maksymalnyKatSkretu;
+    }
+    public String getNazwa() {
+        return nazwa;
+    }
+    public void setNazwa(String nazwa) {
+        this.nazwa = nazwa;
     }
 
     public Auto() {
@@ -37,14 +43,14 @@ public class Auto {
         this.predkoscMaksymalna = 100;                  // km/h
         this.czasOsiagnieciaPredkosciMaksymalnej = 10;  // s
         this.czasWyhamowaniazPredkosciMaksymalnej = 5;  // s
-        this.maksymalnyPromienSkretu = 3;               // stopnie
+        this.maksymalnyKatSkretu = 3;               // stopnie
     }
 
-    public Auto(String nazwa, float predkoscMaksymalna, float czasOsiagnieciaPredkosciMaksymalnej, float czasWyhamowaniazPredkosciMaksymalnej, float maksymalnyPromienSkretu) {
+    public Auto(String nazwa, float predkoscMaksymalna, float czasOsiagnieciaPredkosciMaksymalnej, float czasWyhamowaniazPredkosciMaksymalnej, float maksymalnyKatSkretu) {
         this.nazwa = nazwa;
         this.predkoscMaksymalna = predkoscMaksymalna;
         this.czasOsiagnieciaPredkosciMaksymalnej = czasOsiagnieciaPredkosciMaksymalnej;
         this.czasWyhamowaniazPredkosciMaksymalnej = czasWyhamowaniazPredkosciMaksymalnej;
-        this.maksymalnyPromienSkretu = maksymalnyPromienSkretu;
+        this.maksymalnyKatSkretu = maksymalnyKatSkretu;
     }
 }

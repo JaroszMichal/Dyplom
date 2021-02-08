@@ -51,7 +51,7 @@
                   </grid>
                 </constraints>
                 <properties>
-                  <text value="nie zdefiniowana"/>
+                  <text value=""/>
                 </properties>
               </component>
               <component id="80fb1" class="javax.swing.JButton" binding="trasaButton">
@@ -97,7 +97,7 @@
             <properties/>
             <border type="none" title="Sterowanie skrętem"/>
             <children>
-              <component id="4998e" class="javax.swing.JLabel" binding="turnIcoLBL">
+              <component id="4998e" class="javax.swing.JLabel" binding="skretIcoLBL">
                 <constraints>
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
                     <minimum-size width="30" height="30"/>
@@ -108,14 +108,14 @@
                   <text value=""/>
                 </properties>
               </component>
-              <component id="53f63" class="javax.swing.JLabel">
+              <component id="53f63" class="javax.swing.JLabel" binding="skretOpisLBL">
                 <constraints>
                   <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
                     <minimum-size width="100" height="-1"/>
                   </grid>
                 </constraints>
                 <properties>
-                  <text value="nie zdefiniowane"/>
+                  <text value=""/>
                 </properties>
               </component>
               <component id="2617d" class="javax.swing.JButton" binding="skretBTN">
@@ -136,7 +136,7 @@
             <properties/>
             <border type="none" title="Sterowanie przyśpieszeniem"/>
             <children>
-              <component id="b4ba5" class="javax.swing.JLabel" binding="speedIcoLBL">
+              <component id="b4ba5" class="javax.swing.JLabel" binding="predkoscIcoLBL">
                 <constraints>
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
                     <minimum-size width="30" height="30"/>
@@ -147,14 +147,14 @@
                   <text value=""/>
                 </properties>
               </component>
-              <component id="299c1" class="javax.swing.JLabel" binding="speedOpisLBL">
+              <component id="299c1" class="javax.swing.JLabel" binding="predkoscOpisLBL">
                 <constraints>
                   <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
                     <minimum-size width="100" height="-1"/>
                   </grid>
                 </constraints>
                 <properties>
-                  <text value="nie zdefiniowane"/>
+                  <text value=""/>
                 </properties>
               </component>
               <component id="60d46" class="javax.swing.JButton" binding="predkoscBTN">
@@ -193,7 +193,7 @@
                   </grid>
                 </constraints>
                 <properties>
-                  <text value="nie zdefiniowane"/>
+                  <text value=""/>
                 </properties>
               </component>
               <component id="22010" class="javax.swing.JButton" binding="autoButton">
@@ -221,6 +221,7 @@
                   </grid>
                 </constraints>
                 <properties>
+                  <horizontalAlignment value="0"/>
                   <text value=""/>
                 </properties>
               </component>
@@ -231,6 +232,7 @@
                   </grid>
                 </constraints>
                 <properties>
+                  <horizontalAlignment value="0"/>
                   <text value=""/>
                 </properties>
               </component>
@@ -241,6 +243,7 @@
                   </grid>
                 </constraints>
                 <properties>
+                  <horizontalAlignment value="0"/>
                   <text value=""/>
                 </properties>
               </component>
@@ -273,6 +276,7 @@
                   </grid>
                 </constraints>
                 <properties>
+                  <horizontalAlignment value="0"/>
                   <text value=""/>
                 </properties>
               </component>
