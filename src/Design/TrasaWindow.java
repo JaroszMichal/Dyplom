@@ -19,7 +19,9 @@ public class TrasaWindow extends JFrame {
     private JButton zapiszBTN;
     private JLabel nazwaPlikuLBL;
     private JPanel mainPanel;
+    private JPanel rtPNL;
     private TrasaPanel trasaPNL;
+
 
     public TrasaWindow(SystemSterowania systemSterowania, MainWindow mw) {
         add(mainPanel);
@@ -30,7 +32,6 @@ public class TrasaWindow extends JFrame {
         setLocation(20, 20);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setTitle("Trasa");
-
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setVisible(true);
         UstawPolaFormularza(systemSterowania);
@@ -45,7 +46,13 @@ public class TrasaWindow extends JFrame {
         zapiszBTN.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                trasaPNL.saveCanvas();
+               trasaPNL.saveCanvas();
+            }
+        });
+        wczytajBTN.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                trasaPNL.loadImage();
             }
         });
     }
