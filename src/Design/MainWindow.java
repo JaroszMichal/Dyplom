@@ -1,6 +1,5 @@
 package Design;
 
-import Project.Czujniki;
 import Project.Ikony;
 import Project.SystemSterowania;
 
@@ -31,16 +30,12 @@ public class MainWindow extends JFrame {
     private JLabel light3LBL;
     private JLabel light4LBL;
     private JLabel skretOpisLBL;
-    private JLabel testLBL;
+    private PanelGry graPNL;
     private SystemSterowania systemSterowania;
     private final SilnikWindow[] sw = {null, null};
 
     public SilnikWindow getSw(int i) {
         return sw[i];
-    }
-
-    public void setTestLBL(String s) {
-        this.testLBL.setText(s);
     }
 
     public MainWindow(){
@@ -84,7 +79,7 @@ public class MainWindow extends JFrame {
 
     public void UstawPolaFormularza(){
         int ileZielonych=0;
-        if (systemSterowania.getTrasa()!=null) {
+        if (systemSterowania.getTrasa().getImage()!=null) {
             trasaIcoLBL.setIcon(Ikony.Green(30));
             trasaOpisLBL.setText(systemSterowania.getTrasa().getNazwa());
             ileZielonych++;
@@ -138,5 +133,8 @@ public class MainWindow extends JFrame {
             light4LBL.setIcon(Green(40));
             startButton.setEnabled(true);
         }
+        if (systemSterowania.getTrasa().getImage()!=null)
+            graPNL.UstawObraz(systemSterowania.getTrasa().getImage());
     }
+
 }

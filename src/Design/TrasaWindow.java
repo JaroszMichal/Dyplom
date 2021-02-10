@@ -24,13 +24,12 @@ public class TrasaWindow extends JFrame {
     private JPanel rtPNL;
     private TrasaPanel trasaPNL;
     private JLabel komunikatLBL;
+    private JButton zaakceptujTrasęButton;
+    private JCheckBox startCHK;
 
 
     public TrasaWindow(SystemSterowania systemSterowania, MainWindow mw) {
         add(mainPanel);
-//        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-//        int width = (int)screenSize.getWidth();
-//        int height = (int)screenSize.getHeight();
         setSize(600, 400);
         setLocation(20, 20);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -83,6 +82,8 @@ public class TrasaWindow extends JFrame {
                     default:
                         komunikatLBL.setText("Wczytano dane z pliku: " + file.getName());
                         nazwaPlikuLBL.setText(file.getName());
+                        systemSterowania.getTrasa().setImage(trasaPNL.PobierzObrazzPanelu());
+                        mw.UstawPolaFormularza();
 //                        sw.UstawPolaFormularza(systemSterowania, mw, ktorySilnik);
 //                        OdswiezPolaFormularza(systemSterowania,ktorySilnik,ktoryCzujnik);
                         break;
@@ -90,6 +91,20 @@ public class TrasaWindow extends JFrame {
                 }
             } else
                 komunikatLBL.setText("Anulowano odczyt z pliku.");
+        });
+        zaakceptujTrasęButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                systemSterowania.getTrasa().setImage(trasaPNL.ZaakceptujTrase());
+                mw.UstawPolaFormularza();
+                setVisible(false);
+            }
+        });
+        startCHK.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                trasaPNL.setStart(startCHK.isSelected());
+            }
         });
     }
 
