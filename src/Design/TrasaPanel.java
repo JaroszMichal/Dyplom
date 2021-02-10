@@ -9,7 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class TrasaPanel extends JPanel implements MouseMotionListener, MouseListener, MouseWheelListener {
+public class TrasaPanel extends JPanel implements MouseMotionListener, MouseListener, MouseWheelListener, KeyListener {
     int x=-10;
     int y=-10;
     private BufferedImage image;
@@ -20,12 +20,16 @@ public class TrasaPanel extends JPanel implements MouseMotionListener, MouseList
     boolean rysunekWczytany = false;
     private int xStart = 0;
     private int yStart = 0;
+    private int xWidth,yHeight;
+    private double proporcjeObrazka;
     private double zoom = 1;
 
     public TrasaPanel(){
         addMouseMotionListener(this);
         addMouseListener(this);
         addMouseWheelListener(this);
+        addKeyListener(this);
+        setFocusable(true);
     }
 
     protected void paintComponent(Graphics g) {
@@ -33,8 +37,9 @@ public class TrasaPanel extends JPanel implements MouseMotionListener, MouseList
         Graphics2D g2 = (Graphics2D)g;
         if (rysunekWczytany) {
             BufferedImage sub;
-            sub = image.getSubimage(xStart,yStart,rozmiarX(image),rozmiarY(image));
-            g2.drawImage(sub, 0, 0, this.getWidth(), this.getHeight(), null);
+            Oblicz();
+            sub = image.getSubimage(xStart,yStart,xWidth,yHeight);
+            g2.drawImage(sub, 0, 0, Math.min(getWidth(),image.getWidth()),Math.min(getHeight(),image.getHeight()), null);
         }
         else {
             g2.setColor(Color.BLACK);
@@ -47,21 +52,22 @@ public class TrasaPanel extends JPanel implements MouseMotionListener, MouseList
             NarysujRozdzielczosc(g2);
     }
 
-    private int rozmiarX(BufferedImage image) {
-        int result;
-        result = (int)(image.getWidth()*zoom);
-        return result;
-    }
-
-    private int rozmiarY(BufferedImage image) {
-        int result;
-        result = (int)(image.getHeight()*zoom);
-        return result;
+    private void Oblicz() {
+        xWidth = Math.min((int)(this.getWidth()*zoom), image.getWidth());
+        yHeight= Math.min((int)(this.getHeight()*zoom), image.getHeight());
+        if (xStart<0)
+            xStart = 0;
+        if (xStart > image.getWidth()- xWidth)
+            xStart = image.getWidth()- xWidth;
+        if (yStart<0)
+            yStart = 0;
+        if (yStart > image.getHeight()-yHeight)
+            yStart = image.getHeight()-yHeight;
     }
 
     private void NarysujRozdzielczosc(Graphics2D g2) {
         g2.setColor(Color.WHITE);
-        String str = "("+getWidth()+", "+getHeight()+"), zoom = "+zoom;
+        String str = "("+getWidth()+", "+getHeight()+"), zoom = "+zoom+", xStart = "+xStart+", yStart = "+yStart;
         g2.drawString(str, 10,10);
     }
 
@@ -71,14 +77,6 @@ public class TrasaPanel extends JPanel implements MouseMotionListener, MouseList
             listapunktow.add(new Point(e.getX() - brush / 2, e.getY() - brush / 2));
             repaint();
         }
-        if (SwingUtilities.isRightMouseButton(e)){
-            xStart+=e.getX();
-            yStart+=e.getY();
-            if (xStart<0) xStart=0;
-            if (yStart<0) yStart=0;
-//            if (xStart+image.getWidth())
-            repaint();
-        }
     }
 
     @Override
@@ -86,31 +84,33 @@ public class TrasaPanel extends JPanel implements MouseMotionListener, MouseList
 
     }
 
-    public void saveCanvas() {
+    public boolean zapiszDoPliku(File file) {
 
         BufferedImage bi=new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
         zapis = true;
         repaint();
         Graphics2D g2=(Graphics2D)bi.getGraphics();
-
         paint(g2);
         try {
-            ImageIO.write(bi, "png", new File("C:\\java\\canvas.png"));
+            ImageIO.write(bi, "png", file);
+            zapis = false;
+            repaint();
+            return true;
         } catch (Exception e) {
-
+            return false;
         }
-        zapis = false;
-        repaint();
     }
 
-    public void loadImage(){
+    public int WczytajzPliku(File file){
         try {
-            image = ImageIO.read(new File("C:\\java\\canvas.png"));
+            image = ImageIO.read(file);
             rysunekWczytany = true;
             listapunktow.clear();
             repaint();
-        } catch (IOException ex) {
+            return 1;
+        } catch (Exception ex) {
             ex.printStackTrace();
+            return 0;
         }
     }
     @Override
@@ -142,13 +142,47 @@ public class TrasaPanel extends JPanel implements MouseMotionListener, MouseList
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         if(e.getWheelRotation()<0){ //rolka do przodu
-            zoom+=0.1;
+            zoom-=0.1;
         }
         else {                      // rolka w dół
-            zoom-=0.1;
+            zoom+=0.1;
         }
         if (zoom<0.3) zoom = 0.3;
         if (zoom>1) zoom = 1;
         repaint();
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+        System.out.println(".");
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        int keyCode = e.getKeyCode();
+        switch (keyCode){
+            case KeyEvent.VK_UP:
+                yStart--;
+                if (yStart<0)
+                    yStart = 0;
+                break;
+            case KeyEvent.VK_DOWN:
+                yStart++;
+                break;
+            case KeyEvent.VK_LEFT:
+                xStart--;
+                if (xStart<0)
+                    xStart=0;
+                break;
+            case KeyEvent.VK_RIGHT:
+                xStart++;
+                break;
+        }
+        repaint();
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+
     }
 }
