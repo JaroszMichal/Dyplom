@@ -9,28 +9,39 @@ import java.io.File;
 import java.util.ArrayList;
 
 public class PanelGry extends JPanel implements KeyListener {
+
+//  tło - obraz, położenie zoom
     private BufferedImage image;
     private int xStart = 0;
     private int yStart = 0;
     private int xWidth,yHeight;
     private double zoom = 1;
+//  ruch klawiszami
     private boolean left = false;
     private boolean right = false;
     private boolean up = false;
     private boolean down = false;
+//  parametry auta
+    private int carX;
+    private int carY;
+    private int angle=0;
+    private double speed;
+//    private
 
     public PanelGry(){
         addKeyListener(this);
         setFocusable(true);
+        UstawParametryStartoweAuta();
         new Thread(() -> {
             try {
                 while (true) {
-                    if (down) yStart++;
-                    if (up) yStart--;
-                    if (left) xStart--;
-                    if (right) xStart++;
+                    if (down) speed--;
+                    if (up) speed++;
+                    if (left) angle--;
+                    if (right) angle++;
+                    ObliczParametryJazdy();
                     repaint();
-                    Thread.sleep(30);
+                    Thread.sleep(33);
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -38,20 +49,31 @@ public class PanelGry extends JPanel implements KeyListener {
         }).start();
     }
 
+    private void ObliczParametryJazdy() {
+        carX = carX + (int)(speed * Math.cos(Math.toRadians(angle)));
+        carY = carY + (int)(speed * Math.sin(Math.toRadians(angle)));
+    }
+
+    private void UstawParametryStartoweAuta() {
+        carX=100;
+        carY=100;
+        angle=0;
+        speed=0;
+
+    }
+
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         if (image!=null) {
             Graphics2D g2 = (Graphics2D)g;
-            BufferedImage sub;
-            Oblicz();
-            sub = image.getSubimage(xStart,yStart,xWidth,yHeight);
+            BufferedImage sub = WstawTrase();
             g2.drawImage(sub, 0, 0, Math.min(getWidth(),image.getWidth()),Math.min(getHeight(),image.getHeight()), null);
-            g2.setColor(Color.WHITE);
+            NarysujAuto(g);
             NarysujRozdzielczosc(g2);
         }
     }
 
-    private void Oblicz() {
+    private BufferedImage WstawTrase() {
         xWidth = Math.min((int)(this.getWidth()*zoom), image.getWidth());
         yHeight= Math.min((int)(this.getHeight()*zoom), image.getHeight());
         if (xStart<0)
@@ -62,6 +84,23 @@ public class PanelGry extends JPanel implements KeyListener {
             yStart = 0;
         if (yStart > image.getHeight()-yHeight)
             yStart = image.getHeight()-yHeight;
+        return image.getSubimage(xStart,yStart,xWidth,yHeight);
+    }
+    private void NarysujAuto(Graphics g){
+        Graphics2D g2 = (Graphics2D)g.create();
+        g2.setColor(Color.RED);
+        Rectangle rect2 = new Rectangle(carX, carY, 60, 30);
+
+        g2.rotate(Math.toRadians(angle), rect2.x+rect2.width/2, rect2.y+rect2.height/2);
+        g2.draw(rect2);
+        g2.fill(rect2);
+        g2.setColor(Color.BLUE);
+        g2.drawLine(rect2.x, rect2.y, rect2.x+rect2.width/2, rect2.y+rect2.height/2);
+        g2.drawLine(rect2.x, rect2.y+rect2.height, rect2.x+rect2.width/2, rect2.y+rect2.height/2);
+        g2.drawLine(rect2.x+ rect2.width/2, rect2.y, rect2.x+rect2.width, rect2.y+rect2.height/2);
+        g2.drawLine(rect2.x+ rect2.width/2, rect2.y+rect2.height, rect2.x+rect2.width, rect2.y+rect2.height/2);
+        g2.drawRect(rect2.x, rect2.y, rect2.width, rect2.height);
+        g2.dispose();
     }
 
     private void NarysujRozdzielczosc(Graphics2D g2) {

@@ -1,6 +1,6 @@
 package Design;
 
-import Project.Punkt;
+import java.util.Observable;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -108,7 +108,7 @@ public class TrasaPanel extends JPanel implements MouseMotionListener, MouseList
 
     private void NarysujRozdzielczosc() {
         g2.setColor(Color.WHITE);
-        String str = "("+getWidth()+", "+getHeight()+"), zoom = "+zoom+", xStart = "+xStart+", yStart = "+yStart + kolor;
+        String str = "("+getWidth()+", "+getHeight()+"), zoom = "+zoom+", xStart = "+xStart+", yStart = "+yStart +"start = "+start+ kolor;
         g2.drawString(str, 10,10);
     }
 
@@ -136,10 +136,10 @@ public class TrasaPanel extends JPanel implements MouseMotionListener, MouseList
             if (c.equals(Color.WHITE))
                 NaszkicujLinieStartu();
             else{
-                liniaStartuX0 = -10;
-                liniaStartuY0 = -10;
-                liniaStartuX2 = -10;
-                liniaStartuY2 = -10;
+                liniaStartuX0 = -20;
+                liniaStartuY0 = -20;
+                liniaStartuX2 = -20;
+                liniaStartuY2 = -20;
             }
         }
     }
@@ -231,11 +231,8 @@ public class TrasaPanel extends JPanel implements MouseMotionListener, MouseList
     }
     @Override
     public void mouseClicked(MouseEvent e) {
-//        setCursor(blankCursor);
-//        image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
-//        Graphics2D g2 = (Graphics2D) image.getGraphics();
-//        setCursor(Cursor.getDefaultCursor());
-//        repaint();
+        if (start)
+            start = false;
     }
 
     @Override
