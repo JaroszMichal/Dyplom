@@ -103,6 +103,7 @@ public class TrasaWindow extends JFrame {
         startCHK.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                trasaPNL.setZoom(1);
                 trasaPNL.setStart(startCHK.isSelected());
             }
         });

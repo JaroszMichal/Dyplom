@@ -26,7 +26,8 @@ public class TrasaPanel extends JPanel implements MouseMotionListener, MouseList
     private boolean down = false;
     private boolean start;
     private double liniaStartuX0, liniaStartuY0;
-    private int liniaStartuX1, liniaStartuY1;
+    private double liniaStartuX1, liniaStartuY1;
+    private double liniaStartuX2, liniaStartuY2;
     private String kolor=".";
     private Graphics2D g2;
     private Cursor blankCursor;
@@ -36,6 +37,12 @@ public class TrasaPanel extends JPanel implements MouseMotionListener, MouseList
     }
     public void setStart(boolean start) {
         this.start = start;
+    }
+    public double getZoom() {
+        return zoom;
+    }
+    public void setZoom(double zoom) {
+        this.zoom = zoom;
     }
 
     public TrasaPanel(){
@@ -81,7 +88,9 @@ public class TrasaPanel extends JPanel implements MouseMotionListener, MouseList
         if (!zapis)
             NarysujRozdzielczosc();
         g2.setColor(Color.MAGENTA);
-        g2.drawLine((int)liniaStartuX0, (int)liniaStartuY0, liniaStartuX1, liniaStartuY1);
+        BasicStroke grubaLinia = new BasicStroke(12.0f);
+        g2.setStroke(grubaLinia);
+        g2.drawLine((int)liniaStartuX0, (int)liniaStartuY0, (int)liniaStartuX2, (int)liniaStartuY2);
     }
 
     private void Oblicz() {
@@ -114,46 +123,81 @@ public class TrasaPanel extends JPanel implements MouseMotionListener, MouseList
     @Override
     public void mouseMoved(MouseEvent e) {
         if (start) {
-            setCursor(blankCursor);
-            BufferedImage bi=new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
-            Graphics2D g2=(Graphics2D)bi.getGraphics();
-            paint(g2);
-            setCursor(Cursor.getDefaultCursor());
-            liniaStartuX1=e.getX();
-            liniaStartuY1=e.getY();
-            Color c = new Color(bi.getRGB(liniaStartuX1,liniaStartuY1));
+            if (image==null) {
+                setCursor(blankCursor);
+                image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
+                Graphics2D g2 = (Graphics2D) image.getGraphics();
+                paint(g2);
+                setCursor(Cursor.getDefaultCursor());
+            }
+            liniaStartuX1=xStart+e.getX();
+            liniaStartuY1=yStart+e.getY();
+            Color c = new Color(image.getRGB((int)liniaStartuX1,(int)liniaStartuY1));
             if (c.equals(Color.WHITE))
-                NaszkicujLinieStartu(bi);
+                NaszkicujLinieStartu();
             else{
                 liniaStartuX0 = -10;
                 liniaStartuY0 = -10;
-                liniaStartuX1 = -10;
-                liniaStartuY1 = -10;
+                liniaStartuX2 = -10;
+                liniaStartuY2 = -10;
             }
         }
     }
 
-    private void NaszkicujLinieStartu(BufferedImage bi) {
-        NajblizszyPunktSpozaTrasy(bi);
-        kolor = ", x = "+liniaStartuX1+", y = "+liniaStartuY1+", punkt.x = "+liniaStartuX0+", punkt.y = "+liniaStartuY0;
+    private void NaszkicujLinieStartu() {
+        NajblizszyPunktSpozaTrasy();
+        kolor += ", x1 = ("+liniaStartuX1+", "+liniaStartuY1+"), x0 = ("+liniaStartuX0+", "+liniaStartuY0+")";
         repaint();
     }
 
-    private void NajblizszyPunktSpozaTrasy(BufferedImage bi) {
+    private void NajblizszyPunktSpozaTrasy() {
         int r=1;
-        int x0, y0;
+        double x0, y0;
         do{
-            for (int i=0; i<360;i+=1){
-                x0 = (int)(r*Math.cos(Math.toRadians(i)));
-                y0 = (int)(r*Math.sin(Math.toRadians(i)));
-                if (!(new Color(bi.getRGB(liniaStartuX1+x0,liniaStartuY1-y0)).equals(Color.white))){
-                    liniaStartuX0 = liniaStartuX1+x0;
-                    liniaStartuY0 = liniaStartuY1-y0;
-                    return;
+            for (int i=0; i<360;i++){
+                x0 = r*Math.cos(Math.toRadians(i));
+                y0 = r*Math.sin(Math.toRadians(i));
+                int newX0 = (int)(liniaStartuX1+x0);
+                int newY0 = (int)(liniaStartuY1-y0);
+                int newX1 = (int)(liniaStartuX1-x0);
+                int newY1 = (int)(liniaStartuY1+y0);
+                if (wObrazie(newX0, newY0) && wObrazie(newX1, newY1)) {
+                    if (!(new Color(image.getRGB(newX0, newY0)).equals(Color.white))) {
+                        kolor = ", r = "+r+", x0,y0 = ("+x0+", "+y0+"), ";
+                        liniaStartuX0 = newX0;
+                        liniaStartuY0 = newY0;
+                        liniaStartuX2 = newX1;
+                        liniaStartuY2 = newY1;
+                        return;
+//                        r = 99;
+                    }
                 }
+//                    int next=5;
+//                    Color c;
+//                    do{
+//                        next++;
+//                        if (x0!=0)
+//                            c = new Color(image.getRGB(liniaStartuX1-next,(int)(liniaStartuY1+next*y0/x0)));
+//                        else
+//                            c = new Color(image.getRGB(liniaStartuX1,liniaStartuY1+next));
+//                    }while(!c.equals(Color.white));
+//                    if (x0!=0) {
+//                        liniaStartuX1 -= next;
+//                        liniaStartuY1 = (int) (liniaStartuY1 + next * y0 / x0);
+//                    }
+//                    else{
+//                        liniaStartuY1 = liniaStartuY1 + next;
+//                    }
             }
             r++;
-        }while (r!=1000);
+        }while (r!=100);
+    }
+
+    private boolean wObrazie(int newX, int newY) {
+        if ((newX>=0) && (newX<image.getWidth()) && (newY>=0) && (newY<image.getHeight()))
+            return true;
+        else
+            return false;
     }
 
     public boolean zapiszDoPliku(File file) {
@@ -187,7 +231,11 @@ public class TrasaPanel extends JPanel implements MouseMotionListener, MouseList
     }
     @Override
     public void mouseClicked(MouseEvent e) {
-
+//        setCursor(blankCursor);
+//        image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
+//        Graphics2D g2 = (Graphics2D) image.getGraphics();
+//        setCursor(Cursor.getDefaultCursor());
+//        repaint();
     }
 
     @Override
@@ -213,14 +261,16 @@ public class TrasaPanel extends JPanel implements MouseMotionListener, MouseList
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        if (e.getWheelRotation() < 0) { //rolka do przodu
-            zoom -= 0.1;
-        } else {                      // rolka w dół
-            zoom += 0.1;
+        if (!start) {
+            if (e.getWheelRotation() < 0) { //rolka do przodu
+                zoom -= 0.1;
+            } else {                      // rolka w dół
+                zoom += 0.1;
+            }
+            if (zoom < 0.3) zoom = 0.3;
+            if (zoom > 1) zoom = 1;
+            repaint();
         }
-        if (zoom < 0.3) zoom = 0.3;
-        if (zoom > 1) zoom = 1;
-        repaint();
     }
 
     @Override
