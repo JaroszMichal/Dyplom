@@ -22,11 +22,14 @@ public class PanelGry extends JPanel implements KeyListener {
     private boolean up = false;
     private boolean down = false;
 //  parametry auta
+    private double carXdouble;
+    private double carYdouble;
     private int carX;
     private int carY;
     private int angle=0;
     private double speed;
 //    private
+    private String komunikat="";
 
     public PanelGry(){
         addKeyListener(this);
@@ -50,11 +53,16 @@ public class PanelGry extends JPanel implements KeyListener {
     }
 
     private void ObliczParametryJazdy() {
-        carX = carX + (int)(speed * Math.cos(Math.toRadians(angle)));
-        carY = carY + (int)(speed * Math.sin(Math.toRadians(angle)));
+        komunikat = "angle = "+angle+", speed = "+speed;
+        carXdouble = carXdouble + speed * Math.cos(Math.toRadians(angle));
+        carYdouble = carYdouble + speed * Math.sin(Math.toRadians(angle));
+        carX = (int)carXdouble;
+        carY = (int)carYdouble;
     }
 
     private void UstawParametryStartoweAuta() {
+        carXdouble=100;
+        carYdouble=100;
         carX=100;
         carY=100;
         angle=0;
@@ -105,7 +113,7 @@ public class PanelGry extends JPanel implements KeyListener {
 
     private void NarysujRozdzielczosc(Graphics2D g2) {
         g2.setColor(Color.WHITE);
-        String str = "("+getWidth()+", "+getHeight()+"), zoom = "+zoom+", xStart = "+xStart+", yStart = "+yStart;
+        String str = "("+getWidth()+", "+getHeight()+"), zoom = "+zoom+", xStart = "+xStart+", yStart = "+yStart+" "+komunikat;
         g2.drawString(str, 10,10);
     }
 
