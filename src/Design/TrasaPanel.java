@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public class TrasaPanel extends JPanel implements MouseMotionListener, MouseListener, MouseWheelListener, KeyListener {
     private BufferedImage image;
     private ArrayList<Point> listapunktow = new ArrayList<>();
-    private int brush = 50;
+    private int brush = 90;
     boolean zapis = false;
     boolean rysunekWczytany = false;
     private int xStart = 0;
@@ -258,16 +258,16 @@ public class TrasaPanel extends JPanel implements MouseMotionListener, MouseList
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        if (!start) {
-            if (e.getWheelRotation() < 0) { //rolka do przodu
-                zoom -= 0.1;
-            } else {                      // rolka w dół
-                zoom += 0.1;
-            }
-            if (zoom < 0.3) zoom = 0.3;
-            if (zoom > 1) zoom = 1;
-            repaint();
-        }
+//        if (!start) {
+//            if (e.getWheelRotation() < 0) { //rolka do przodu
+//                zoom -= 0.1;
+//            } else {                      // rolka w dół
+//                zoom += 0.1;
+//            }
+//            if (zoom < 0.3) zoom = 0.3;
+//            if (zoom > 1) zoom = 1;
+//            repaint();
+//        }
     }
 
     @Override
