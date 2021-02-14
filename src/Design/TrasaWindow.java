@@ -92,8 +92,9 @@ public class TrasaWindow extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 systemSterowania.getTrasa().setImage(trasaPNL.ZaakceptujTrase());
-                mw.UstawPolaFormularza();
                 setVisible(false);
+                mw.UstawPolaFormularza();
+
             }
         });
         startCHK.addActionListener(new ActionListener() {

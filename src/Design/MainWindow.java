@@ -72,6 +72,7 @@ public class MainWindow extends JFrame {
         trasaButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                graPNL.setImage(null);
                 TrasaWindow tw = new TrasaWindow(systemSterowania, MainWindow.this);
             }
         });

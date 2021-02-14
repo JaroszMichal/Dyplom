@@ -87,10 +87,12 @@ public class TrasaPanel extends JPanel implements MouseMotionListener, MouseList
                 g2.fillOval(listapunktow.get(i).x, listapunktow.get(i).y, brush, brush);
         if (!zapis)
             NarysujRozdzielczosc();
-        g2.setColor(Color.MAGENTA);
-        BasicStroke grubaLinia = new BasicStroke(12.0f);
-        g2.setStroke(grubaLinia);
-        g2.drawLine((int)liniaStartuX0, (int)liniaStartuY0, (int)liniaStartuX2, (int)liniaStartuY2);
+        if ((liniaStartuX0>0) && (liniaStartuY0>0) && (liniaStartuX2>0) && (liniaStartuY2>0)) {
+            g2.setColor(Color.MAGENTA);
+            BasicStroke grubaLinia = new BasicStroke(12.0f);
+            g2.setStroke(grubaLinia);
+            g2.drawLine((int) liniaStartuX0, (int) liniaStartuY0, (int) liniaStartuX2, (int) liniaStartuY2);
+        }
     }
 
     private void Oblicz() {
@@ -136,10 +138,10 @@ public class TrasaPanel extends JPanel implements MouseMotionListener, MouseList
             if (c.equals(Color.WHITE))
                 NaszkicujLinieStartu();
             else{
-                liniaStartuX0 = -20;
-                liniaStartuY0 = -20;
-                liniaStartuX2 = -20;
-                liniaStartuY2 = -20;
+                liniaStartuX0 = -100;
+                liniaStartuY0 = -100;
+                liniaStartuX2 = -100;
+                liniaStartuY2 = -100;
             }
         }
     }
