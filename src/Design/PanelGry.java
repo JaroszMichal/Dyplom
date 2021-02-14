@@ -37,6 +37,10 @@ public class PanelGry extends JPanel implements KeyListener {
     private Punkt leweTylne;
     private Punkt praweTylne;
     private boolean kolizja;
+//  pomiar czasu
+    private boolean naPoluStart;
+    private long czasStart;
+    private long ostatnieKolko;
     //    private
     private String komunikat="";
 
@@ -99,8 +103,20 @@ public class PanelGry extends JPanel implements KeyListener {
             } else {
                 ObliczParametryJazdy();
                 NarysujAuto(g);
+                MierzCzas();
                 NarysujKomunikaty(g2);
             }
+        }
+    }
+
+    private void MierzCzas() {
+        if ((naPoluStart)&&(!(new Color(image.getRGB((int)srodekPrzodu.getX(), (int)srodekPrzodu.getY())).equals(Color.MAGENTA)))){
+            naPoluStart=false;
+            czasStart = System.currentTimeMillis();
+        }
+        if ((!naPoluStart)&&((new Color(image.getRGB((int)srodekPrzodu.getX(), (int)srodekPrzodu.getY()))).equals(Color.MAGENTA))){
+            naPoluStart=true;
+            ostatnieKolko = System.currentTimeMillis() - czasStart;
         }
     }
 
@@ -187,7 +203,7 @@ public class PanelGry extends JPanel implements KeyListener {
 
         carXdouble = (gornyLewy.getX()+dolnyPrawy.getX())/2 - carWidth/2*Math.cos(angle);
         carYdouble = (gornyLewy.getY()+dolnyPrawy.getY())/2 + carWidth/2*Math.sin(angle);
-
+        naPoluStart = true;
 //      ustawiamy ramkę widoku
         if (image.getWidth()<this.getWidth())
             xStart = 0;
@@ -222,10 +238,6 @@ public class PanelGry extends JPanel implements KeyListener {
     }
 
     private BufferedImage WstawTrase() {
-        int thw = this.getWidth();
-        int imW = image.getWidth();
-        int thh = this.getHeight();
-        int imh = image.getHeight();
         xWidth = Math.min(this.getWidth(), image.getWidth());
         yHeight= Math.min(this.getHeight(), image.getHeight());
 
@@ -240,8 +252,6 @@ public class PanelGry extends JPanel implements KeyListener {
             yStart = 0;
         if (yStart+yHeight>image.getHeight())
             yStart = image.getHeight()-yHeight;
-//        xStart = image.getWidth()-xWidth;
-//        yStart = image.getHeight()-yHeight;
 
         return image.getSubimage(xStart,yStart,xWidth,yHeight);
     }
@@ -254,9 +264,8 @@ public class PanelGry extends JPanel implements KeyListener {
         int docelowyIntCarX = (int)(carXdouble+deltaX);
         int docelowyIntCarY = (int)(carYdouble+deltaY);
 
-
         carXdouble = carXdouble + deltaX;
-        carYdouble = carYdouble +deltaY;
+        carYdouble = carYdouble + deltaY;
         if (carXdouble <= polPrzekatnejAuta)
             carXdouble = polPrzekatnejAuta;
         if (carXdouble >= image.getWidth()-polPrzekatnejAuta)
@@ -292,18 +301,27 @@ public class PanelGry extends JPanel implements KeyListener {
     private void NarysujKomunikaty(Graphics2D g2) {
         g2.setColor(Color.WHITE);
         g2.drawString(komunikat, 10,10);
+        g2.setFont(new Font("Helvetica", Font.BOLD, 20));
+        if (ostatnieKolko!=0)
+            g2.drawString("Ostatnie kółko: "+ SformatujCzas(ostatnieKolko),10,yHeight-60);
+        if (!naPoluStart)
+            g2.drawString("Czas: "+ SformatujCzas(System.currentTimeMillis() - czasStart),10,yHeight-30);
     }
 
-    private int ileKolPozaTrasa() {
-        int result = 0;
-        if (!(new Color(image.getRGB((int)lewePrzednie.getX(), (int)lewePrzednie.getY())).equals(Color.white))
-                && !(new Color(image.getRGB((int)lewePrzednie.getX(), (int)lewePrzednie.getY())).equals(Color.MAGENTA))) result++;
-        if (!(new Color(image.getRGB((int)prawePrzednie.getX(), (int)prawePrzednie.getY())).equals(Color.white))
-                && !(new Color(image.getRGB((int)prawePrzednie.getX(), (int)prawePrzednie.getY())).equals(Color.MAGENTA))) result++;
-        if (!(new Color(image.getRGB((int)leweTylne.getX(), (int)leweTylne.getY())).equals(Color.white))
-                && !(new Color(image.getRGB((int)leweTylne.getX(), (int)leweTylne.getY())).equals(Color.MAGENTA))) result++;
-        if (!(new Color(image.getRGB((int)praweTylne.getX(), (int)praweTylne.getY())).equals(Color.white))
-                && !(new Color(image.getRGB((int)praweTylne.getX(), (int)praweTylne.getY())).equals(Color.MAGENTA))) result++;
+    private String SformatujCzas(long l) {
+        long milis = l % 1000;
+        l /= 1000;
+        long sec = l % 60;
+        l /= 60;
+        long min = l % 60;
+        l /= 60;
+        return l +":"+Uzupelnij(min,2)+":"+Uzupelnij(sec,2)+":"+Uzupelnij(milis,3);
+    }
+
+    private String Uzupelnij(long l, int i) {
+        String result = Long.toString(l);
+        while (result.length()<i)
+            result = "0"+result;
         return result;
     }
 
@@ -317,18 +335,6 @@ public class PanelGry extends JPanel implements KeyListener {
     }
 
     private void ObliczPozycjeKol() {
-//        double polPrzekatnej = Math.sqrt(Math.pow(carWidth/2, 2)+Math.pow(carHeight/2,2));
-//        double srodekX = carX + carWidth/2;
-//        double srodekY = carY + carHeight/2;
-//        double katMiedzyPrzekatnymi = 2 * Math.toDegrees(Math.atan(carHeight*1.0/carWidth));
-//        lewePrzednie.setX(srodekX+polPrzekatnej*Math.cos(Math.toRadians(angle + katMiedzyPrzekatnymi / 2)));
-//        lewePrzednie.setY(srodekY+polPrzekatnej*Math.sin(Math.toRadians(angle + katMiedzyPrzekatnymi / 2)));
-//        prawePrzednie.setX(srodekX+polPrzekatnej*Math.cos(Math.toRadians(angle - katMiedzyPrzekatnymi / 2)));
-//        prawePrzednie.setY(srodekY+polPrzekatnej*Math.sin(Math.toRadians(angle - katMiedzyPrzekatnymi / 2)));
-//        leweTylne.setX(srodekX-polPrzekatnej*Math.cos(Math.toRadians(angle - katMiedzyPrzekatnymi / 2)));
-//        leweTylne.setY(srodekY-polPrzekatnej*Math.sin(Math.toRadians(angle - katMiedzyPrzekatnymi / 2)));
-//        praweTylne.setX(srodekX-polPrzekatnej*Math.cos(Math.toRadians(angle + katMiedzyPrzekatnymi / 2)));
-//        praweTylne.setY(srodekY-polPrzekatnej*Math.sin(Math.toRadians(angle + katMiedzyPrzekatnymi / 2)));
         srodekPrzodu.setX(carXdouble+carWidth/2*Math.cos(angle));
         srodekPrzodu.setY(carYdouble-carWidth/2*Math.sin(angle));
         lewePrzednie.setX(srodekPrzodu.getX()-carHeight/2*Math.cos(Math.PI/2-angle));
@@ -339,6 +345,19 @@ public class PanelGry extends JPanel implements KeyListener {
         leweTylne.setY(lewePrzednie.getY()+carWidth*Math.sin(angle));
         praweTylne.setX(prawePrzednie.getX()-carWidth*Math.cos(angle));
         praweTylne.setY(prawePrzednie.getY()+carWidth*Math.sin(angle));
+    }
+
+    private int ileKolPozaTrasa() {
+        int result = 0;
+        if (!(new Color(image.getRGB((int)lewePrzednie.getX(), (int)lewePrzednie.getY())).equals(Color.white))
+                && !(new Color(image.getRGB((int)lewePrzednie.getX(), (int)lewePrzednie.getY())).equals(Color.MAGENTA))) result++;
+        if (!(new Color(image.getRGB((int)prawePrzednie.getX(), (int)prawePrzednie.getY())).equals(Color.white))
+                && !(new Color(image.getRGB((int)prawePrzednie.getX(), (int)prawePrzednie.getY())).equals(Color.MAGENTA))) result++;
+        if (!(new Color(image.getRGB((int)leweTylne.getX(), (int)leweTylne.getY())).equals(Color.white))
+                && !(new Color(image.getRGB((int)leweTylne.getX(), (int)leweTylne.getY())).equals(Color.MAGENTA))) result++;
+        if (!(new Color(image.getRGB((int)praweTylne.getX(), (int)praweTylne.getY())).equals(Color.white))
+                && !(new Color(image.getRGB((int)praweTylne.getX(), (int)praweTylne.getY())).equals(Color.MAGENTA))) result++;
+        return result;
     }
 
     public void centerString(Graphics g, Rectangle r, String s,
