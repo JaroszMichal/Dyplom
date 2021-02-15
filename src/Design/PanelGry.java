@@ -37,6 +37,18 @@ public class PanelGry extends JPanel implements KeyListener {
     private Punkt leweTylne;
     private Punkt praweTylne;
     private boolean kolizja;
+//  czujniki
+    private boolean pokazDzialanieCzujnikow;
+    private boolean pokazWartosciCzujnikow;
+
+    private double czPredkosc;
+    private double czPolozenieNaTorze;
+    private double czOdleglosciKierunekZakretu;
+    private Punkt punktZlewej;
+    private Punkt punktZprawej;
+    private Punkt punktPrzedLewym;
+    private Punkt punktPrzedPrawym;
+
 //  pomiar czasu
     private boolean naPoluStart;
     private long czasStart;
@@ -65,6 +77,8 @@ public class PanelGry extends JPanel implements KeyListener {
         prawePrzednie = new Punkt(0,0);
         leweTylne = new Punkt(0,0);
         praweTylne = new Punkt(0,0);
+        pokazDzialanieCzujnikow = false;
+        pokazWartosciCzujnikow = true;
 
         new Thread(() -> {
             try {
@@ -104,9 +118,29 @@ public class PanelGry extends JPanel implements KeyListener {
                 ObliczParametryJazdy();
                 NarysujAuto(g);
                 MierzCzas();
+                if (pokazWartosciCzujnikow)
+                    NarysujWskazaniaCzujnikow(g2);
                 NarysujKomunikaty(g2);
             }
         }
+    }
+
+    private void NarysujWskazaniaCzujnikow(Graphics2D g2) {
+        g2.setColor(Color.GREEN);
+        g2.setFont(new Font("Helvetica", Font.PLAIN+Font.LAYOUT_LEFT_TO_RIGHT, 10));
+        FontMetrics fontMetrics = g2.getFontMetrics();
+        String s = Double.toString(czPredkosc);
+        g2.drawString("Prędkość" , this.getWidth() - 150,10);
+        g2.drawString(s , this.getWidth() -fontMetrics.stringWidth(s)-10 ,10);
+        s = Double.toString(Math.round(czPolozenieNaTorze*1000) / 1000.0);
+        g2.drawString("Położenie na torze = ", this.getWidth() -150,20);
+        g2.drawString(s, this.getWidth() -fontMetrics.stringWidth(s)-10,20);
+        s = Double.toString(Math.round(Math.abs(czOdleglosciKierunekZakretu)*1000) / 1000.0);
+        if (czOdleglosciKierunekZakretu<0)
+            g2.drawString("Zakręt w lewo za = ", this.getWidth() -150,30);
+        else
+            g2.drawString("Zakręt w prawo za = ", this.getWidth() -150,30);
+        g2.drawString(s, this.getWidth() -fontMetrics.stringWidth(s)-10,30);
     }
 
     private void MierzCzas() {
@@ -130,6 +164,8 @@ public class PanelGry extends JPanel implements KeyListener {
         if (e.getKeyCode() == KeyEvent.VK_UP) up = true;
         if (e.getKeyCode() == KeyEvent.VK_DOWN) down = true;
         if (e.getKeyCode() == KeyEvent.VK_P) pauza = !pauza;
+        if (e.getKeyCode() == KeyEvent.VK_2) pokazDzialanieCzujnikow = !pokazDzialanieCzujnikow;
+        if (e.getKeyCode() == KeyEvent.VK_1) pokazWartosciCzujnikow = !pokazWartosciCzujnikow;
     }
 
     @Override
@@ -257,15 +293,23 @@ public class PanelGry extends JPanel implements KeyListener {
     }
 
     private void ObliczParametryJazdy() {
-        double deltaX = speed * Math.cos(angle);
-        double deltaY = - speed * Math.sin(angle);
-        int intCarX = (int)carXdouble;
-        int intCarY = (int)carYdouble;
-        int docelowyIntCarX = (int)(carXdouble+deltaX);
-        int docelowyIntCarY = (int)(carYdouble+deltaY);
-
-        carXdouble = carXdouble + deltaX;
-        carYdouble = carYdouble + deltaY;
+        ObliczCzujniki();
+        double tmpCarX = carXdouble;
+        double tmpCarY = carYdouble;
+        double tmpSpeed = speed;
+        for (int i=0;i<10;i++) {
+            carXdouble = tmpCarX + (i*0.1+0.1)*speed*Math.cos(angle);
+            carYdouble = tmpCarY - (i*0.1+0.1)*speed*Math.sin(angle);
+            ObliczPozycjeKol();
+            if (przednieKoloPozaTrasa()) {
+                tmpSpeed = ((i-1)*0.1+0.1)*speed;
+                i=10;
+            }
+        }
+        carXdouble = carXdouble + tmpSpeed * Math.cos(angle);
+        carYdouble = carYdouble - tmpSpeed * Math.sin(angle);
+        if (tmpSpeed!=speed)
+            speed = 0;
         if (carXdouble <= polPrzekatnejAuta)
             carXdouble = polPrzekatnejAuta;
         if (carXdouble >= image.getWidth()-polPrzekatnejAuta)
@@ -277,6 +321,68 @@ public class PanelGry extends JPanel implements KeyListener {
         ObliczPozycjeKol();
         kolizja = !jestMozliwyRuch();
         //komunikat += "Kolizja = "+kolizja;
+    }
+
+    private void ObliczCzujniki() {
+//      CZUJNIK PRĘDKOŚCI
+        czPredkosc = speed;
+//      CZUJNIK POŁOŻENIA NA TORZE - LEWO, PRAWO
+        punktZlewej = new Punkt(0,0);
+        punktZprawej = new Punkt(0,0);
+        int lewo=0;
+        do{
+            lewo++;
+            punktZlewej.setX(carXdouble+lewo*Math.cos(angle+Math.PI/2));
+            punktZlewej.setY(carYdouble-lewo*Math.sin(angle+Math.PI/2));
+        }while((new Color(image.getRGB((int)punktZlewej.getX(), (int)punktZlewej.getY())).equals(Color.white))
+                || (new Color(image.getRGB((int)punktZlewej.getX(), (int)punktZlewej.getY())).equals(Color.MAGENTA)));
+        lewo--;
+        punktZlewej.setX(carXdouble+lewo*Math.cos(angle+Math.PI/2));
+        punktZlewej.setY(carYdouble-lewo*Math.sin(angle+Math.PI/2));
+        int prawo=0;
+        do{
+            prawo++;
+            punktZprawej.setX(carXdouble+prawo*Math.cos(angle-Math.PI/2));
+            punktZprawej.setY(carYdouble-prawo*Math.sin(angle-Math.PI/2));
+        }while((new Color(image.getRGB((int)punktZprawej.getX(), (int)punktZprawej.getY())).equals(Color.white))
+                || (new Color(image.getRGB((int)punktZprawej.getX(), (int)punktZprawej.getY())).equals(Color.MAGENTA)));
+        prawo--;
+        punktZprawej.setX(carXdouble+prawo*Math.cos(angle-Math.PI/2));
+        punktZprawej.setY(carYdouble-prawo*Math.sin(angle-Math.PI/2));
+        // dla "lewo =0" czyli auto na lewej bandzie, czujnik przyjmie wartość -1,
+        // jeżeli lewo=prawo (środek toru) czujnik = 0,
+        // jeżeli na prawej bandzie, czujnik = 1
+        czPolozenieNaTorze = (2.0/(lewo+prawo))*lewo-1;
+//      CZUJNIK ODLEGŁOŚCI I KIERUNKU NAJBLIŻESZEGO ZAKRĘTU
+        punktPrzedLewym = new Punkt(0,0);
+        lewo=0;
+        do{
+            lewo++;
+            punktPrzedLewym.setX(lewePrzednie.getX()+lewo*Math.cos(angle));
+            punktPrzedLewym.setY(lewePrzednie.getY()-lewo*Math.sin(angle));
+        }while((new Color(image.getRGB((int)punktPrzedLewym.getX(), (int)punktPrzedLewym.getY())).equals(Color.white))
+                || (new Color(image.getRGB((int)punktPrzedLewym.getX(), (int)punktPrzedLewym.getY())).equals(Color.MAGENTA)));
+        lewo--;
+        punktPrzedLewym.setX(lewePrzednie.getX()+lewo*Math.cos(angle));
+        punktPrzedLewym.setY(lewePrzednie.getY()-lewo*Math.sin(angle));
+        punktPrzedPrawym = new Punkt(0,0);
+        prawo=0;
+        do{
+            prawo++;
+            punktPrzedPrawym.setX(prawePrzednie.getX()+prawo*Math.cos(angle));
+            punktPrzedPrawym.setY(prawePrzednie.getY()-prawo*Math.sin(angle));
+        }while((new Color(image.getRGB((int)punktPrzedPrawym.getX(), (int)punktPrzedPrawym.getY())).equals(Color.white))
+                || (new Color(image.getRGB((int)punktPrzedPrawym.getX(), (int)punktPrzedPrawym.getY())).equals(Color.MAGENTA)));
+        prawo--;
+        punktPrzedPrawym.setX(prawePrzednie.getX()+prawo*Math.cos(angle));
+        punktPrzedPrawym.setY(prawePrzednie.getY()-prawo*Math.sin(angle));
+
+        double odlegloscPrzedLewym = Math.sqrt(Math.pow(lewePrzednie.getX()-punktPrzedLewym.getX(),2)+Math.pow(lewePrzednie.getY()-punktPrzedLewym.getY(),2));
+        double odlegloscPrzedPrawym = Math.sqrt(Math.pow(prawePrzednie.getX()-punktPrzedPrawym.getX(),2)+Math.pow(prawePrzednie.getY()-punktPrzedPrawym.getY(),2));
+        if (odlegloscPrzedPrawym-odlegloscPrzedLewym<0)
+            czOdleglosciKierunekZakretu = -Math.min(odlegloscPrzedPrawym,odlegloscPrzedLewym);
+        else
+            czOdleglosciKierunekZakretu = Math.min(odlegloscPrzedPrawym,odlegloscPrzedLewym);
     }
 
     private boolean jestMozliwyRuch() {
@@ -295,11 +401,17 @@ public class PanelGry extends JPanel implements KeyListener {
         g2.setColor(Color.YELLOW);
         g2.drawLine((int)(leweTylne.getX()-xStart),(int)(leweTylne.getY()-yStart),(int)(srodekPrzodu.getX()-xStart),(int)(srodekPrzodu.getY()-yStart));
         g2.drawLine((int)(praweTylne.getX()-xStart),(int)(praweTylne.getY()-yStart),(int)(srodekPrzodu.getX()-xStart),(int)(srodekPrzodu.getY()-yStart));
+        if (pokazDzialanieCzujnikow) {
+            g2.setColor(Color.MAGENTA);
+            g2.drawLine((int) (punktZlewej.getX() - xStart), (int) (punktZlewej.getY() - yStart), (int) (punktZprawej.getX() - xStart), (int) (punktZprawej.getY() - yStart));
+            g2.drawLine((int) (lewePrzednie.getX() - xStart), (int) (lewePrzednie.getY() - yStart), (int) (punktPrzedLewym.getX() - xStart), (int) (punktPrzedLewym.getY() - yStart));
+            g2.drawLine((int) (prawePrzednie.getX() - xStart), (int) (prawePrzednie.getY() - yStart), (int) (punktPrzedPrawym.getX() - xStart), (int) (punktPrzedPrawym.getY() - yStart));
+        }
         g2.dispose();
     }
 
     private void NarysujKomunikaty(Graphics2D g2) {
-        g2.setColor(Color.WHITE);
+        g2.setColor(Color.BLUE);
         g2.drawString(komunikat, 10,10);
         g2.setFont(new Font("Helvetica", Font.BOLD, 20));
         if (ostatnieKolko!=0)
@@ -358,6 +470,14 @@ public class PanelGry extends JPanel implements KeyListener {
         if (!(new Color(image.getRGB((int)praweTylne.getX(), (int)praweTylne.getY())).equals(Color.white))
                 && !(new Color(image.getRGB((int)praweTylne.getX(), (int)praweTylne.getY())).equals(Color.MAGENTA))) result++;
         return result;
+    }
+
+    private boolean przednieKoloPozaTrasa() {
+        if (!(new Color(image.getRGB((int)lewePrzednie.getX(), (int)lewePrzednie.getY())).equals(Color.white))
+                && !(new Color(image.getRGB((int)lewePrzednie.getX(), (int)lewePrzednie.getY())).equals(Color.MAGENTA))) return true;
+        if (!(new Color(image.getRGB((int)prawePrzednie.getX(), (int)prawePrzednie.getY())).equals(Color.white))
+                && !(new Color(image.getRGB((int)prawePrzednie.getX(), (int)prawePrzednie.getY())).equals(Color.MAGENTA))) return true;
+        return false;
     }
 
     public void centerString(Graphics g, Rectangle r, String s,

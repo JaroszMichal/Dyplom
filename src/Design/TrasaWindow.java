@@ -79,9 +79,6 @@ public class TrasaWindow extends JFrame {
                         komunikatLBL.setText("Wczytano dane z pliku: " + file.getName());
                         nazwaPlikuLBL.setText(file.getName());
                         systemSterowania.getTrasa().setImage(trasaPNL.PobierzObrazzPanelu());
-                        mw.UstawPolaFormularza();
-//                        sw.UstawPolaFormularza(systemSterowania, mw, ktorySilnik);
-//                        OdswiezPolaFormularza(systemSterowania,ktorySilnik,ktoryCzujnik);
                         break;
 
                 }
@@ -100,8 +97,8 @@ public class TrasaWindow extends JFrame {
         startCHK.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                trasaPNL.setZoom(1);
                 trasaPNL.setStart(startCHK.isSelected());
+                trasaPNL.repaint();
             }
         });
     }
