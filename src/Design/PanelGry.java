@@ -44,8 +44,7 @@ public class PanelGry extends JPanel implements KeyListener {
     private Punkt prawePrzednie;
     private Punkt leweTylne;
     private Punkt praweTylne;
-    private boolean kolizja;
-//  czujniki
+    //  czujniki
     private boolean pokazDzialanieCzujnikow;
     private boolean pokazWartosciCzujnikow;
     private boolean pokazParametryAuta;
@@ -84,7 +83,6 @@ public class PanelGry extends JPanel implements KeyListener {
         angle=0;
         predkosc=0;
         speed=0;
-        kolizja = false;
         pauza = false;
         srodekPrzodu = new Punkt(0,0);
         lewePrzednie = new Punkt(0,0);
@@ -382,7 +380,6 @@ public class PanelGry extends JPanel implements KeyListener {
         if (carYdouble >= image.getHeight()-polPrzekatnejAuta)
             carYdouble = image.getHeight()-polPrzekatnejAuta;
         ObliczPozycjeKol();
-        kolizja = !jestMozliwyRuch();
         //komunikat += "Kolizja = "+kolizja;
     }
 
