@@ -46,7 +46,7 @@ public class MainWindow extends JFrame {
         setLocation(5,10);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         UstawPolaFormularza();
-
+        graPNL.setSystemSterowania(systemSterowania);
         predkoscBTN.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
