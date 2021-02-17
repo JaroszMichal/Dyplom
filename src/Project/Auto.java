@@ -39,9 +39,9 @@ public class Auto {
     }
 
     public Auto() {
-        this.nazwa = "Auto";
+        this.nazwa = "Citroen Berlingo";
         this.predkoscMaksymalna = 100;                  // km/h
-        this.czasOsiagnieciaPredkosciMaksymalnej = 10;  // s
+        this.czasOsiagnieciaPredkosciMaksymalnej = 5;  // s
         this.czasWyhamowaniazPredkosciMaksymalnej = 5;  // s
         this.maksymalnyKatSkretu = 3;               // stopnie
     }

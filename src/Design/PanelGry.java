@@ -14,6 +14,9 @@ public class PanelGry extends JPanel implements KeyListener {
 
     //  System sterowania
     private SystemSterowania systemSterowania;
+    private boolean systemSteruje;
+    private double sterowaniePredkoscia;
+    private double sterowanieSkretem;
 
 //  tło - obraz, położenie zoom
     private BufferedImage image;
@@ -34,6 +37,7 @@ public class PanelGry extends JPanel implements KeyListener {
     private double carXdouble;
     private double carYdouble;
     private double angle;
+    private double predkosc;
     private double speed;
     private Punkt srodekPrzodu;
     private Punkt lewePrzednie;
@@ -78,6 +82,7 @@ public class PanelGry extends JPanel implements KeyListener {
         carHeight = 20;
         polPrzekatnejAuta = Math.sqrt(Math.pow(carWidth,2)+Math.pow(carHeight,2)) / 2;
         angle=0;
+        predkosc=0;
         speed=0;
         kolizja = false;
         pauza = false;
@@ -88,14 +93,37 @@ public class PanelGry extends JPanel implements KeyListener {
         praweTylne = new Punkt(0,0);
         pokazDzialanieCzujnikow = false;
         pokazWartosciCzujnikow = true;
+        systemSteruje = false;
 
         new Thread(() -> {
             try {
                 while (true) {
-                    if (down) speed--;
-                    if (up) speed+=systemSterowania.getAuto().getPredkoscMaksymalna()/(systemSterowania.getAuto().getCzasOsiagnieciaPredkosciMaksymalnej()*33);
-                    if (left) angle+=Math.toRadians(systemSterowania.getAuto().getMaksymalnyKatSkretu());
-                    if (right) angle-=Math.toRadians(systemSterowania.getAuto().getMaksymalnyKatSkretu());
+                    if (systemSteruje){
+                        sterowaniePredkoscia = 1;
+                        sterowanieSkretem = 1.2;
+                    }
+                    else {
+                        sterowaniePredkoscia = 1;
+                        sterowanieSkretem = 1;
+                    }
+                    if (((!systemSteruje) && (down)) || ((systemSteruje) && (sterowaniePredkoscia<0))) {
+                        double dV = Math.abs(sterowaniePredkoscia) * systemSterowania.getAuto().getPredkoscMaksymalna()*0.033*1000/3600/systemSterowania.getAuto().getCzasWyhamowaniazPredkosciMaksymalnej();
+                        predkosc-=dV;
+                        if (predkosc<0)
+                            predkosc=0;
+                        speed = predkosc*0.033*10;
+                    }
+                    if (((!systemSteruje) && (up)) || ((systemSteruje) && (sterowaniePredkoscia>=0))) {
+                        double dV = sterowaniePredkoscia * systemSterowania.getAuto().getPredkoscMaksymalna()*0.033*1000/3600/systemSterowania.getAuto().getCzasOsiagnieciaPredkosciMaksymalnej();
+                        predkosc+=dV;
+                        if (predkosc>systemSterowania.getAuto().getPredkoscMaksymalna()*1000/3600)
+                            predkosc=systemSterowania.getAuto().getPredkoscMaksymalna()*1000/3600;
+                        speed = predkosc*0.033*10;
+                    }
+                    if (((!systemSteruje) && (left)) || ((systemSteruje) && (sterowanieSkretem<0)))
+                        angle += Math.abs(sterowanieSkretem) * Math.toRadians(systemSterowania.getAuto().getMaksymalnyKatSkretu());
+                    if (((!systemSteruje) && (right)) || ((systemSteruje) && (sterowanieSkretem>=0)))
+                        angle -= sterowanieSkretem * Math.toRadians(systemSterowania.getAuto().getMaksymalnyKatSkretu());
                     angle = angle % (2*Math.PI);
                     repaint();
                     Thread.sleep(33);
@@ -140,8 +168,8 @@ public class PanelGry extends JPanel implements KeyListener {
         g2.setColor(Color.GREEN);
         g2.setFont(new Font("Helvetica", Font.PLAIN+Font.LAYOUT_LEFT_TO_RIGHT, 10));
         FontMetrics fontMetrics = g2.getFontMetrics();
-        String s = Double.toString(czPredkosc);
-        g2.drawString("Prędkość" , this.getWidth() - 250,10);
+        String s = Double.toString(Math.round(czPredkosc*1000) / 1000.0);
+        g2.drawString("Prędkość [km/h] = " , this.getWidth() - 250,10);
         g2.drawString(s , this.getWidth() -fontMetrics.stringWidth(s)-10 ,10);
         s = Double.toString(Math.round(czPolozenieNaTorze*1000) / 1000.0);
         g2.drawString("Położenie na torze = ", this.getWidth() -250,20);
@@ -336,13 +364,15 @@ public class PanelGry extends JPanel implements KeyListener {
             ObliczPozycjeKol();
             if (przednieKoloPozaTrasa()) {
                 tmpSpeed = ((i-1)*0.1+0.1)*speed;
-                i=10;
+                break;
             }
         }
         carXdouble = carXdouble + tmpSpeed * Math.cos(angle);
         carYdouble = carYdouble - tmpSpeed * Math.sin(angle);
-        if (tmpSpeed!=speed)
+        if (tmpSpeed!=speed) {
+            predkosc = 0;
             speed = 0;
+        }
         if (carXdouble <= polPrzekatnejAuta)
             carXdouble = polPrzekatnejAuta;
         if (carXdouble >= image.getWidth()-polPrzekatnejAuta)
@@ -359,7 +389,7 @@ public class PanelGry extends JPanel implements KeyListener {
     private void ObliczCzujniki() {
         try {
 //      CZUJNIK PRĘDKOŚCI
-            czPredkosc = speed;
+            czPredkosc = predkosc*3.6;
 //      CZUJNIK POŁOŻENIA NA TORZE - LEWO, PRAWO
             punktZlewej = new Punkt(0, 0);
             punktZprawej = new Punkt(0, 0);
