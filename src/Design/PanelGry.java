@@ -235,7 +235,7 @@ public class PanelGry extends JPanel implements KeyListener {
             alfa = Math.PI/2;
         else
             alfa = Math.atan((p1.getY()-p2.getY())/(p2.getX()-p1.getX()));
-        angle = alfa-Math.PI/2;
+        angle = alfa+Math.PI/2;
 
         carXdouble = (gornyLewy.getX()+dolnyPrawy.getX())/2 - carWidth/2*Math.cos(angle);
         carYdouble = (gornyLewy.getY()+dolnyPrawy.getY())/2 + carWidth/2*Math.sin(angle);
