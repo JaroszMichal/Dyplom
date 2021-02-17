@@ -72,7 +72,7 @@ public class TrasaPanel extends JPanel implements MouseMotionListener, MouseList
 
     private void NarysujRozdzielczosc() {
         g2.setColor(Color.WHITE);
-        String str = "start = "+start +", "+komunikat;
+        String str = "("+getWidth()+", "+getHeight()+"),start = "+start +", "+komunikat;
         g2.drawString(str, 10,10);
     }
 
@@ -229,6 +229,7 @@ public class TrasaPanel extends JPanel implements MouseMotionListener, MouseList
         repaint();
         Graphics2D g2=(Graphics2D)bi.getGraphics();
         paint(g2);
+        zapis = false;
         return bi;
     }
 }
