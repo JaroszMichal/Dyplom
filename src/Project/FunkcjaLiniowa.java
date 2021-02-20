@@ -31,9 +31,6 @@ public class FunkcjaLiniowa {
     public List<Punkt> getPunkty() {
         return punkty;
     }
-    public void setPunkty(List<Punkt> punkty) {
-        this.punkty = punkty;
-    }
 
     public FunkcjaLiniowa(){
         nazwa = "no name";
@@ -52,7 +49,7 @@ public class FunkcjaLiniowa {
     public int Dodaj(Punkt p){
         if (CzyJuzJestTakiX(p.getX()))
             return 1;
-        if (CzyJestSpozaDziedziny(p.getX()))
+        if (JestSpozaDziedziny(p.getX()))
             return 2;
         punkty.add(p);
         Collections.sort(punkty, new Comparator<Punkt>() {
@@ -84,7 +81,7 @@ public class FunkcjaLiniowa {
         return -1;
     }
 
-    private boolean CzyJestSpozaDziedziny(double x) {
+    private boolean JestSpozaDziedziny(double x) {
         if ((!dziedzinaCzujnika.isDziedzinaCzyOdNiesk()) && ((x<dziedzinaCzujnika.getDziedzinaOdWart()) || ((!dziedzinaCzujnika.isDziedzinaOdCzyNalezy())&&(x==dziedzinaCzujnika.getDziedzinaOdWart())))) return true;
         if ((!dziedzinaCzujnika.isDziedzinaCzyDoNiesk()) && ((x>dziedzinaCzujnika.getDziedzinaDoWart()) || ((!dziedzinaCzujnika.isDziedzinaDoCzyNalezy())&&(x==dziedzinaCzujnika.getDziedzinaDoWart())))) return true;
         return false;
@@ -94,5 +91,25 @@ public class FunkcjaLiniowa {
         for (int i=0; i<punkty.size(); i++)
             if (punkty.get(i).getX() == x) return true;
         return false;
+    }
+
+    public double WartoscFunkcji(double czujnikWartosc) {
+        if (punkty.size()==0)
+            return 0;
+        if (czujnikWartosc<=punkty.get(0).getX())
+            return punkty.get(0).getY();
+        if (czujnikWartosc>=punkty.get(punkty.size()-1).getX())
+            return punkty.get(punkty.size()-1).getY();
+        for (int i=0; i<punkty.size()-1;i++)
+            if ((czujnikWartosc>=punkty.get(i).getX()) && (czujnikWartosc<=punkty.get(i+1).getX())) {
+                double x0, x1, y0,y1;
+                x0 = punkty.get(i).getX();
+                x1 = punkty.get(i+1).getX();
+                y0 = punkty.get(i).getY();
+                y1 = punkty.get(i+1).getY();
+                return (y1-y0)*czujnikWartosc/(x1-x0)+y0-x0*(y1-y0)/(x1-x0);
+            }
+        // nie ma prawa tu dojść metoda.
+        return 0;
     }
 }

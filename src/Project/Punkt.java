@@ -12,4 +12,5 @@ public class Punkt {
         this.x = x;
         this.y = y;
     }
+
 }

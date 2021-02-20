@@ -1,14 +1,8 @@
 package Project;
 
-import Design.FunkcjeCzujnika;
-import javafx.stage.FileChooser;
-import javafx.stage.Window;
-
-import javax.swing.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;

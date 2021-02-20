@@ -1,5 +1,6 @@
 package Design;
 
+import Project.Czujniki;
 import Project.Punkt;
 import Project.SystemSterowania;
 
@@ -9,6 +10,8 @@ import java.awt.event.*;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PanelGry extends JPanel implements KeyListener {
 
@@ -52,6 +55,7 @@ public class PanelGry extends JPanel implements KeyListener {
     private double czPredkosc;
     private double czPolozenieNaTorze;
     private double czOdleglosciKierunekZakretu;
+    private double czCombo;
     private Punkt punktZlewej;
     private Punkt punktZprawej;
     private Punkt punktPrzedLewym;
@@ -97,7 +101,7 @@ public class PanelGry extends JPanel implements KeyListener {
             try {
                 while (true) {
                     if (systemSteruje){
-                        sterowaniePredkoscia = 1;
+                        sterowaniePredkoscia = ObliczWspolczynnikSterowaniaPredkoscia(czPredkosc);
                         sterowanieSkretem = 1.2;
                     }
                     else {
@@ -118,9 +122,9 @@ public class PanelGry extends JPanel implements KeyListener {
                             predkosc=systemSterowania.getAuto().getPredkoscMaksymalna()*1000/3600;
                         speed = predkosc*0.033*10;
                     }
-                    if (((!systemSteruje) && (left)) || ((systemSteruje) && (sterowanieSkretem<0)))
+                    if ((speed!=0) && (((!systemSteruje) && (left)) || ((systemSteruje) && (sterowanieSkretem<0))))
                         angle += Math.abs(sterowanieSkretem) * Math.toRadians(systemSterowania.getAuto().getMaksymalnyKatSkretu());
-                    if (((!systemSteruje) && (right)) || ((systemSteruje) && (sterowanieSkretem>=0)))
+                    if ((speed!=0) && (((!systemSteruje) && (right)) || ((systemSteruje) && (sterowanieSkretem>=0))))
                         angle -= sterowanieSkretem * Math.toRadians(systemSterowania.getAuto().getMaksymalnyKatSkretu());
                     angle = angle % (2*Math.PI);
                     repaint();
@@ -178,6 +182,9 @@ public class PanelGry extends JPanel implements KeyListener {
         else
             g2.drawString("Zakręt w prawo za = ", this.getWidth() -250,30);
         g2.drawString(s, this.getWidth() -fontMetrics.stringWidth(s)-10,30);
+        s = Double.toString(Math.round(czCombo*1000) / 1000.0);
+        g2.drawString("Combo = ", this.getWidth() -250,40);
+        g2.drawString(s, this.getWidth() -fontMetrics.stringWidth(s)-10,40);
     }
 
     private void NarysujParametryAuta(Graphics2D g2) {
@@ -440,19 +447,21 @@ public class PanelGry extends JPanel implements KeyListener {
 
             double odlegloscPrzedLewym = Math.sqrt(Math.pow(lewePrzednie.getX() - punktPrzedLewym.getX(), 2) + Math.pow(lewePrzednie.getY() - punktPrzedLewym.getY(), 2));
             double odlegloscPrzedPrawym = Math.sqrt(Math.pow(prawePrzednie.getX() - punktPrzedPrawym.getX(), 2) + Math.pow(prawePrzednie.getY() - punktPrzedPrawym.getY(), 2));
-            if (odlegloscPrzedPrawym - odlegloscPrzedLewym < 0)
-                czOdleglosciKierunekZakretu = -Math.min(odlegloscPrzedPrawym, odlegloscPrzedLewym);
+            if (odlegloscPrzedPrawym < odlegloscPrzedLewym)
+                czOdleglosciKierunekZakretu = -odlegloscPrzedPrawym;
             else
-                czOdleglosciKierunekZakretu = Math.min(odlegloscPrzedPrawym, odlegloscPrzedLewym);
+                czOdleglosciKierunekZakretu = odlegloscPrzedLewym;
+            czOdleglosciKierunekZakretu/=10;
         }
         catch (Exception e){}
-    }
+//      CZUJNIK COMBO
+        if (czOdleglosciKierunekZakretu!=0)
+            czCombo = Math.pow(czPredkosc,2)*systemSterowania.getAuto().getCzasWyhamowaniazPredkosciMaksymalnej()/(2*systemSterowania.getAuto().getPredkoscMaksymalna()) / czOdleglosciKierunekZakretu;
+        else {
+            czCombo = -100;
+            czOdleglosciKierunekZakretu = -0.1;
+        }
 
-    private boolean jestMozliwyRuch() {
-        if (ileKolPozaTrasa()>0)
-            return false;
-        else
-            return true;
     }
 
     private void NarysujAuto(Graphics g){
@@ -522,19 +531,6 @@ public class PanelGry extends JPanel implements KeyListener {
         praweTylne.setY(prawePrzednie.getY()+carWidth*Math.sin(angle));
     }
 
-    private int ileKolPozaTrasa() {
-        int result = 0;
-        if (!(new Color(image.getRGB((int)lewePrzednie.getX(), (int)lewePrzednie.getY())).equals(Color.white))
-                && !(new Color(image.getRGB((int)lewePrzednie.getX(), (int)lewePrzednie.getY())).equals(Color.MAGENTA))) result++;
-        if (!(new Color(image.getRGB((int)prawePrzednie.getX(), (int)prawePrzednie.getY())).equals(Color.white))
-                && !(new Color(image.getRGB((int)prawePrzednie.getX(), (int)prawePrzednie.getY())).equals(Color.MAGENTA))) result++;
-        if (!(new Color(image.getRGB((int)leweTylne.getX(), (int)leweTylne.getY())).equals(Color.white))
-                && !(new Color(image.getRGB((int)leweTylne.getX(), (int)leweTylne.getY())).equals(Color.MAGENTA))) result++;
-        if (!(new Color(image.getRGB((int)praweTylne.getX(), (int)praweTylne.getY())).equals(Color.white))
-                && !(new Color(image.getRGB((int)praweTylne.getX(), (int)praweTylne.getY())).equals(Color.MAGENTA))) result++;
-        return result;
-    }
-
     private boolean przednieKoloPozaTrasa() {
         if (!(PunktwObrazie(lewePrzednie)) || (!(new Color(image.getRGB((int)lewePrzednie.getX(), (int)lewePrzednie.getY())).equals(Color.white))
                 && !(new Color(image.getRGB((int)lewePrzednie.getX(), (int)lewePrzednie.getY())).equals(Color.MAGENTA)))) return true;
@@ -565,4 +561,88 @@ public class PanelGry extends JPanel implements KeyListener {
         if ((p.getY()<0)||(p.getY()>=image.getHeight())) return false;
         return true;
     }
+
+    private double ObliczWspolczynnikSterowaniaPredkoscia(double czPredkosc) {
+        int czujnikNr=-1;
+//      analizujemy najpierw funkcję pierwszego czujnika
+        for (int i=0;i<Czujniki.czujniki.length;i++)
+            if (systemSterowania.getSilnik(0).getFunkcjaCzujnika(0).getCzujnik()== Czujniki.czujniki[i])
+                czujnikNr = i;
+        double czujnikWartosc;
+        switch (czujnikNr){
+            case 0:
+                czujnikWartosc = czPredkosc;
+                break;
+            case 1:
+                czujnikWartosc = czPolozenieNaTorze;
+                break;
+            case 2:
+                czujnikWartosc = czOdleglosciKierunekZakretu;
+                break;
+            case 3:
+                czujnikWartosc = czCombo;
+                break;
+            default:
+                czujnikWartosc = 0;
+        }
+
+//      list "punkty" przechowuje pary - (numer funkcji o niezerowej wartości dla czujnika, wartość funkcji w tym punkcie)
+        List<Punkt> punkty0 = new ArrayList<>();
+        for (int i=0; i<systemSterowania.getSilnik(0).getFunkcjaCzujnika(0).getListaFunkcji().size();i++) {
+            double wartosc = systemSterowania.getSilnik(0).getFunkcjaCzujnika(0).getListaFunkcji().get(i).WartoscFunkcji(czujnikWartosc);
+            if (wartosc != 0)
+                punkty0.add(new Punkt(i, wartosc));
+        }
+
+//      analizujemy teraz funkcję drugirgo czujnika
+        for (int i=0;i<Czujniki.czujniki.length;i++)
+            if (systemSterowania.getSilnik(0).getFunkcjaCzujnika(1).getCzujnik()== Czujniki.czujniki[i])
+                czujnikNr = i;
+        switch (czujnikNr){
+            case 0:
+                czujnikWartosc = czPredkosc;
+                break;
+            case 1:
+                czujnikWartosc = czPolozenieNaTorze;
+                break;
+            case 2:
+                czujnikWartosc = czOdleglosciKierunekZakretu;
+                break;
+            case 3:
+                czujnikWartosc = czCombo;
+                break;
+            default:
+                czujnikWartosc = 0;
+        }
+
+//      list "punkty" przechowuje pary - (numer funkcji o niezerowej wartości dla czujnika, wartość funkcji w tym punkcie)
+        List<Punkt> punkty1 = new ArrayList<>();
+        for (int i=0; i<systemSterowania.getSilnik(0).getFunkcjaCzujnika(1).getListaFunkcji().size();i++) {
+            double wartosc = systemSterowania.getSilnik(0).getFunkcjaCzujnika(1).getListaFunkcji().get(i).WartoscFunkcji(czujnikWartosc);
+            if (wartosc != 0)
+                punkty1.add(new Punkt(i, wartosc));
+        }
+//      teraz krzyżujemy wskazania obu czujników i zbieramy wskazane konkluzje, najpierw przyporządkuwując im minimum z warotści funkcji czujników,
+//      potem maximum spośród różnych wskazan na tą samą konkluzję.
+        List<Punkt> punkty2 = new ArrayList<>();
+        boolean powtorzylSie;
+        for(int i=0; i<punkty0.size();i++)
+            for (int j=0;j<punkty1.size();j++){
+                powtorzylSie = false;
+                Punkt p = new Punkt(systemSterowania.getSilnik(0).getRegulywnioskowania()[(int)punkty0.get(i).getX()][(int)punkty1.get(j).getX()],
+                        Math.min(punkty0.get(i).getY(),punkty1.get(j).getY()));
+                for (int k=0;k<punkty2.size();k++)
+                    if (punkty2.get(k).getX()==p.getX()) {
+                        punkty2.set(k, new Punkt(p.getX(), Math.max(p.getY(), punkty2.get(k).getY())));
+                        powtorzylSie = true;
+                    }
+                if (!powtorzylSie)
+                    punkty2.add(p);
+            }
+
+
+
+        return 1;
+    }
+
 }

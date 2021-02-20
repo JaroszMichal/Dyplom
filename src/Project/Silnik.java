@@ -14,9 +14,7 @@ public class Silnik {
     public FunkcjaCzujnika getFunkcjaCzujnika(int i) {
         return funkcjaCzujnika[i];
     }
-    public void setFunkcjaCzujnika(FunkcjaCzujnika[] funkcjaCzujnika) {
-        this.funkcjaCzujnika = funkcjaCzujnika;
-    }
+
     public int[][] getRegulywnioskowania() {
         return regulywnioskowania;
     }
