@@ -1,6 +1,7 @@
 package Design;
 
 import Project.Czujniki;
+import Project.FunkcjaLiniowa;
 import Project.Punkt;
 import Project.SystemSterowania;
 
@@ -101,8 +102,7 @@ public class PanelGry extends JPanel implements KeyListener {
             try {
                 while (true) {
                     if (systemSteruje){
-                        sterowaniePredkoscia = ObliczWspolczynnikSterowaniaPredkoscia(czPredkosc);
-                        sterowanieSkretem = 1.2;
+                        ObliczWspolczynnikiSterowania();
                     }
                     else {
                         sterowaniePredkoscia = 1;
@@ -123,8 +123,10 @@ public class PanelGry extends JPanel implements KeyListener {
                         speed = predkosc*0.033*10;
                     }
                     if ((speed!=0) && (((!systemSteruje) && (left)) || ((systemSteruje) && (sterowanieSkretem<0))))
+//                    if ((speed!=0) && (left))
                         angle += Math.abs(sterowanieSkretem) * Math.toRadians(systemSterowania.getAuto().getMaksymalnyKatSkretu());
                     if ((speed!=0) && (((!systemSteruje) && (right)) || ((systemSteruje) && (sterowanieSkretem>=0))))
+//                    if ((speed!=0) && (right))
                         angle -= sterowanieSkretem * Math.toRadians(systemSterowania.getAuto().getMaksymalnyKatSkretu());
                     angle = angle % (2*Math.PI);
                     repaint();
@@ -157,6 +159,8 @@ public class PanelGry extends JPanel implements KeyListener {
                 ObliczParametryJazdy();
                 NarysujAuto(g);
                 MierzCzas();
+                if (systemSteruje)
+                    NarysujSystemSteruje(g2);
                 if (pokazWartosciCzujnikow)
                     NarysujWskazaniaCzujnikow(g2);
                 if (pokazParametryAuta)
@@ -164,6 +168,13 @@ public class PanelGry extends JPanel implements KeyListener {
                 NarysujKomunikaty(g2);
             }
         }
+    }
+
+    private void NarysujSystemSteruje(Graphics2D g2) {
+        g2.setColor(Color.RED);
+        Rectangle rectangle = new Rectangle(0, 0, this.getWidth(), 50);
+        centerString(g2, rectangle, "AUTOSTEROWANIE", new Font("Helvetica", Font.BOLD, 20));
+
     }
 
     private void NarysujWskazaniaCzujnikow(Graphics2D g2) {
@@ -229,6 +240,7 @@ public class PanelGry extends JPanel implements KeyListener {
         if (e.getKeyCode() == KeyEvent.VK_UP) up = true;
         if (e.getKeyCode() == KeyEvent.VK_DOWN) down = true;
         if (e.getKeyCode() == KeyEvent.VK_P) pauza = !pauza;
+        if (e.getKeyCode() == KeyEvent.VK_A) systemSteruje = !systemSteruje;
         if (e.getKeyCode() == KeyEvent.VK_1) pokazWartosciCzujnikow = !pokazWartosciCzujnikow;
         if (e.getKeyCode() == KeyEvent.VK_2) pokazDzialanieCzujnikow = !pokazDzialanieCzujnikow;
         if (e.getKeyCode() == KeyEvent.VK_3) pokazParametryAuta = !pokazParametryAuta;
@@ -562,87 +574,134 @@ public class PanelGry extends JPanel implements KeyListener {
         return true;
     }
 
-    private double ObliczWspolczynnikSterowaniaPredkoscia(double czPredkosc) {
-        int czujnikNr=-1;
-//      analizujemy najpierw funkcję pierwszego czujnika
-        for (int i=0;i<Czujniki.czujniki.length;i++)
-            if (systemSterowania.getSilnik(0).getFunkcjaCzujnika(0).getCzujnik()== Czujniki.czujniki[i])
-                czujnikNr = i;
-        double czujnikWartosc;
-        switch (czujnikNr){
-            case 0:
-                czujnikWartosc = czPredkosc;
-                break;
-            case 1:
-                czujnikWartosc = czPolozenieNaTorze;
-                break;
-            case 2:
-                czujnikWartosc = czOdleglosciKierunekZakretu;
-                break;
-            case 3:
-                czujnikWartosc = czCombo;
-                break;
-            default:
-                czujnikWartosc = 0;
-        }
-
-//      list "punkty" przechowuje pary - (numer funkcji o niezerowej wartości dla czujnika, wartość funkcji w tym punkcie)
-        List<Punkt> punkty0 = new ArrayList<>();
-        for (int i=0; i<systemSterowania.getSilnik(0).getFunkcjaCzujnika(0).getListaFunkcji().size();i++) {
-            double wartosc = systemSterowania.getSilnik(0).getFunkcjaCzujnika(0).getListaFunkcji().get(i).WartoscFunkcji(czujnikWartosc);
-            if (wartosc != 0)
-                punkty0.add(new Punkt(i, wartosc));
-        }
-
-//      analizujemy teraz funkcję drugirgo czujnika
-        for (int i=0;i<Czujniki.czujniki.length;i++)
-            if (systemSterowania.getSilnik(0).getFunkcjaCzujnika(1).getCzujnik()== Czujniki.czujniki[i])
-                czujnikNr = i;
-        switch (czujnikNr){
-            case 0:
-                czujnikWartosc = czPredkosc;
-                break;
-            case 1:
-                czujnikWartosc = czPolozenieNaTorze;
-                break;
-            case 2:
-                czujnikWartosc = czOdleglosciKierunekZakretu;
-                break;
-            case 3:
-                czujnikWartosc = czCombo;
-                break;
-            default:
-                czujnikWartosc = 0;
-        }
-
-//      list "punkty" przechowuje pary - (numer funkcji o niezerowej wartości dla czujnika, wartość funkcji w tym punkcie)
-        List<Punkt> punkty1 = new ArrayList<>();
-        for (int i=0; i<systemSterowania.getSilnik(0).getFunkcjaCzujnika(1).getListaFunkcji().size();i++) {
-            double wartosc = systemSterowania.getSilnik(0).getFunkcjaCzujnika(1).getListaFunkcji().get(i).WartoscFunkcji(czujnikWartosc);
-            if (wartosc != 0)
-                punkty1.add(new Punkt(i, wartosc));
-        }
-//      teraz krzyżujemy wskazania obu czujników i zbieramy wskazane konkluzje, najpierw przyporządkuwując im minimum z warotści funkcji czujników,
-//      potem maximum spośród różnych wskazan na tą samą konkluzję.
-        List<Punkt> punkty2 = new ArrayList<>();
-        boolean powtorzylSie;
-        for(int i=0; i<punkty0.size();i++)
-            for (int j=0;j<punkty1.size();j++){
-                powtorzylSie = false;
-                Punkt p = new Punkt(systemSterowania.getSilnik(0).getRegulywnioskowania()[(int)punkty0.get(i).getX()][(int)punkty1.get(j).getX()],
-                        Math.min(punkty0.get(i).getY(),punkty1.get(j).getY()));
-                for (int k=0;k<punkty2.size();k++)
-                    if (punkty2.get(k).getX()==p.getX()) {
-                        punkty2.set(k, new Punkt(p.getX(), Math.max(p.getY(), punkty2.get(k).getY())));
-                        powtorzylSie = true;
-                    }
-                if (!powtorzylSie)
-                    punkty2.add(p);
+    private void ObliczWspolczynnikiSterowania() {
+        for (int ktorySilnik=0;ktorySilnik<2;ktorySilnik++){
+            int czujnikNr = -1;
+    //      analizujemy najpierw funkcję pierwszego czujnika
+            for (int i = 0; i < Czujniki.czujniki.length; i++)
+                if (systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(0).getCzujnik().equals(Czujniki.czujniki[i]))
+                    czujnikNr = i;
+            double czujnikWartosc;
+            switch (czujnikNr) {
+                case 0:
+                    czujnikWartosc = czPredkosc;
+                    break;
+                case 1:
+                    czujnikWartosc = czPolozenieNaTorze;
+                    break;
+                case 2:
+                    czujnikWartosc = czOdleglosciKierunekZakretu;
+                    break;
+                case 3:
+                    czujnikWartosc = czCombo;
+                    break;
+                default:
+                    czujnikWartosc = 0;
             }
 
+    //      list "punkty" przechowuje pary - (numer funkcji o niezerowej wartości dla czujnika, wartość funkcji w tym punkcie)
+            List<Punkt> punkty0 = new ArrayList<>();
+            for (int i = 0; i < systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(0).getListaFunkcji().size(); i++) {
+                double wartosc = systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(0).getListaFunkcji().get(i).WartoscFunkcji(czujnikWartosc);
+                if (wartosc != 0)
+                    punkty0.add(new Punkt(i, wartosc));
+            }
 
+    //      analizujemy teraz funkcję drugirgo czujnika
+            for (int i = 0; i < Czujniki.czujniki.length; i++)
+                if (systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(1).getCzujnik().equals(Czujniki.czujniki[i]))
+                    czujnikNr = i;
+            switch (czujnikNr) {
+                case 0:
+                    czujnikWartosc = czPredkosc;
+                    break;
+                case 1:
+                    czujnikWartosc = czPolozenieNaTorze;
+                    break;
+                case 2:
+                    czujnikWartosc = czOdleglosciKierunekZakretu;
+                    break;
+                case 3:
+                    czujnikWartosc = czCombo;
+                    break;
+                default:
+                    czujnikWartosc = 0;
+            }
 
-        return 1;
+    //      list "punkty" przechowuje pary - (numer funkcji o niezerowej wartości dla czujnika, wartość funkcji w tym punkcie)
+            List<Punkt> punkty1 = new ArrayList<>();
+            for (int i = 0; i < systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(1).getListaFunkcji().size(); i++) {
+                double wartosc = systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(1).getListaFunkcji().get(i).WartoscFunkcji(czujnikWartosc);
+                if (wartosc != 0)
+                    punkty1.add(new Punkt(i, wartosc));
+            }
+    //      teraz krzyżujemy wskazania obu czujników i zbieramy wskazane konkluzje, najpierw przyporządkuwując im minimum z warotści funkcji czujników,
+    //      potem maximum spośród różnych wskazan na tą samą konkluzję.
+    //      Lista punkty2 zawiera pary liczb, z których pierwsza wskazuje numer funkcji wyjściowej, a druga to warotść do jakie ma zostać przycięta.
+            List<Punkt> punkty2 = new ArrayList<>();
+            boolean powtorzylSie;
+            for (int i = 0; i < punkty0.size(); i++)
+                for (int j = 0; j < punkty1.size(); j++) {
+                    powtorzylSie = false;
+                    Punkt p = new Punkt(systemSterowania.getSilnik(ktorySilnik).getRegulywnioskowania()[(int) punkty0.get(i).getX()][(int) punkty1.get(j).getX()],
+                            Math.min(punkty0.get(i).getY(), punkty1.get(j).getY()));
+                    for (int k = 0; k < punkty2.size(); k++)
+                        if (punkty2.get(k).getX() == p.getX()) {
+                            punkty2.set(k, new Punkt(p.getX(), Math.max(p.getY(), punkty2.get(k).getY())));
+                            powtorzylSie = true;
+                        }
+                    if (!powtorzylSie)
+                        punkty2.add(p);
+                }
+    //      funkcje wskazane w liscie punkty2 przycinamy do odpowiednich wartości
+            List<FunkcjaLiniowa> funkcjeWyjsciowe = new ArrayList<>();
+            for (int i = 0; i < punkty2.size(); i++) {
+                FunkcjaLiniowa fl = PrzytnijDoWartosci(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(2).getListaFunkcji().get((int) punkty2.get(i).getX()), punkty2.get(i).getY());
+                funkcjeWyjsciowe.add(fl);
+            }
+    //      i sumujemy
+            FunkcjaLiniowa wynik = new FunkcjaLiniowa(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(2).getDziedzinaCzujnika());
+            for (int i = 0; i < funkcjeWyjsciowe.size(); i++)
+                wynik = FunkcjaLiniowa.DodajFunkcje(wynik, funkcjeWyjsciowe.get(i));
+
+    //      no to liczymy wyjście
+            double licznik = 0;
+            double mianownik = 0;
+            int iteracje = 1000;
+            for (int i = 0; i < iteracje; i++) {
+                try {
+                    licznik += ((wynik.getPunkty().get(wynik.getPunkty().size() - 1).getX() - wynik.getPunkty().get(0).getX()) * i / (iteracje - 1) + wynik.getPunkty().get(0).getX()) * wynik.WartoscFunkcji((wynik.getPunkty().get(wynik.getPunkty().size() - 1).getX() - wynik.getPunkty().get(0).getX()) * i / (iteracje - 1) + wynik.getPunkty().get(0).getX());
+                    mianownik += wynik.WartoscFunkcji((wynik.getPunkty().get(wynik.getPunkty().size() - 1).getX() - wynik.getPunkty().get(0).getX()) * i / (iteracje - 1) + wynik.getPunkty().get(0).getX());
+                } catch (Exception e) {
+                    System.out.println(".");
+                }
+            }
+            if (ktorySilnik==0)
+                sterowaniePredkoscia = licznik/mianownik;
+            else
+                sterowanieSkretem = licznik/mianownik;
+        }
+    }
+
+    public FunkcjaLiniowa PrzytnijDoWartosci(FunkcjaLiniowa funkcja, double y) {
+        FunkcjaLiniowa result = new FunkcjaLiniowa(funkcja.getDziedzinaCzujnika());
+        for (int i=0; i<funkcja.getPunkty().size();i++)
+            if (funkcja.getPunkty().get(i).getY() <= y)
+                result.Dodaj(funkcja.getPunkty().get(i));
+            else
+                result.Dodaj(new Punkt(funkcja.getPunkty().get(i).getX(), y));
+        for (int i=1; i<funkcja.getPunkty().size();i++) {
+            if (((funkcja.getPunkty().get(i - 1).getY() < y) && (funkcja.getPunkty().get(i).getY() > y)) ||
+                    ((funkcja.getPunkty().get(i - 1).getY() > y) && (funkcja.getPunkty().get(i).getY()) < y)) {
+                double x0, x1, y0, y1;
+                x0 = funkcja.getPunkty().get(i - 1).getX();
+                x1 = funkcja.getPunkty().get(i).getX();
+                y0 = funkcja.getPunkty().get(i - 1).getY();
+                y1 = funkcja.getPunkty().get(i).getY();
+                result.Dodaj(new Punkt((x1 - x0) * (y - y0) / (y1 - y0) + x0, y));
+            }
+        }
+        return result;
     }
 
 }

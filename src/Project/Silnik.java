@@ -67,6 +67,8 @@ public class Silnik {
             for (int nr=0;nr<3;nr++) {
                 writer.println("f"+nr+"nazwa:" + funkcjaCzujnika[nr].getNazwa());
                 writer.println("f"+nr+"czujnik:" + funkcjaCzujnika[nr].getCzujnik());
+                if (nr==2)
+                    writer.println("f2 opis czujnika:" + funkcjaCzujnika[nr].getOpisCzujnika());
                 for (int i = 0; i < funkcjaCzujnika[nr].getListaFunkcji().size(); i++) {
                     if (funkcjaCzujnika[nr].getListaFunkcji().get(i).getPunkty().size() > 0) {
                         writer.print("f"+nr+"funkcja:" + funkcjaCzujnika[nr].getListaFunkcji().get(i).getNazwa());
@@ -126,8 +128,10 @@ public class Silnik {
                             break;
                         case "f2czujnik":
                             this.getFunkcjaCzujnika(2).setCzujnik(podzielonaLinia[1]);
-                            this.getFunkcjaCzujnika(2).setOpisCzujnika(Czujniki.getOpisCzujnika(this.getFunkcjaCzujnika(2).getCzujnik()));
-                            this.getFunkcjaCzujnika(2).setDziedzinaCzujnika(Czujniki.getDziedzinaCzujnika(this.getFunkcjaCzujnika(2).getCzujnik()));
+                            break;
+                        case "f2 opis czujnika":
+                            this.getFunkcjaCzujnika(2).setOpisCzujnika(podzielonaLinia[1]);
+                            this.getFunkcjaCzujnika(2).setDziedzinaCzujnika(new DziedzinaCzujnika(false, -1, true, false, 1, true));
                             break;
                         case "f0funkcja":
                             funkcjaLiniowa = new FunkcjaLiniowa();
