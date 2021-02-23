@@ -1,5 +1,7 @@
 package Project;
 
+import java.util.Objects;
+
 public class DziedzinaCzujnika {
 //  lewostronna
     private boolean dziedzinaCzyOdNiesk;
@@ -27,6 +29,24 @@ public class DziedzinaCzujnika {
     }
     public boolean isDziedzinaDoCzyNalezy() {
         return dziedzinaDoCzyNalezy;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DziedzinaCzujnika that = (DziedzinaCzujnika) o;
+        return dziedzinaCzyOdNiesk == that.dziedzinaCzyOdNiesk
+                && Double.compare(that.dziedzinaOdWart, dziedzinaOdWart) == 0
+                && dziedzinaOdCzyNalezy == that.dziedzinaOdCzyNalezy
+                && dziedzinaCzyDoNiesk == that.dziedzinaCzyDoNiesk
+                && Double.compare(that.dziedzinaDoWart, dziedzinaDoWart) == 0
+                && dziedzinaDoCzyNalezy == that.dziedzinaDoCzyNalezy;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(dziedzinaCzyOdNiesk, dziedzinaOdWart, dziedzinaOdCzyNalezy, dziedzinaCzyDoNiesk, dziedzinaDoWart, dziedzinaDoCzyNalezy);
     }
 
     public DziedzinaCzujnika(boolean dziedzinaCzyOdNiesk, double dziedzinaOdWart, boolean dziedzinaOdCzyNalezy, boolean dziedzinaCzyDoNiesk, double dziedzinaDoWart, boolean dziedzinaDoCzyNalezy) {

@@ -1,9 +1,6 @@
 package Design;
 
-import Project.Czujniki;
-import Project.FunkcjaLiniowa;
-import Project.Punkt;
-import Project.SystemSterowania;
+import Project.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -599,7 +596,7 @@ public class PanelGry extends JPanel implements KeyListener {
                     czujnikWartosc = 0;
             }
 
-    //      list "punkty" przechowuje pary - (numer funkcji o niezerowej wartości dla czujnika, wartość funkcji w tym punkcie)
+    //      lista "punkty" przechowuje pary - (numer funkcji o niezerowej wartości dla czujnika, wartość funkcji w tym punkcie)
             List<Punkt> punkty0 = new ArrayList<>();
             for (int i = 0; i < systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(0).getListaFunkcji().size(); i++) {
                 double wartosc = systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(0).getListaFunkcji().get(i).WartoscFunkcji(czujnikWartosc);
@@ -628,7 +625,7 @@ public class PanelGry extends JPanel implements KeyListener {
                     czujnikWartosc = 0;
             }
 
-    //      list "punkty" przechowuje pary - (numer funkcji o niezerowej wartości dla czujnika, wartość funkcji w tym punkcie)
+    //      lista "punkty" przechowuje pary - (numer funkcji o niezerowej wartości dla czujnika, wartość funkcji w tym punkcie)
             List<Punkt> punkty1 = new ArrayList<>();
             for (int i = 0; i < systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(1).getListaFunkcji().size(); i++) {
                 double wartosc = systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(1).getListaFunkcji().get(i).WartoscFunkcji(czujnikWartosc);
@@ -649,6 +646,7 @@ public class PanelGry extends JPanel implements KeyListener {
                         if (punkty2.get(k).getX() == p.getX()) {
                             punkty2.set(k, new Punkt(p.getX(), Math.max(p.getY(), punkty2.get(k).getY())));
                             powtorzylSie = true;
+                            break;
                         }
                     if (!powtorzylSie)
                         punkty2.add(p);
@@ -662,7 +660,7 @@ public class PanelGry extends JPanel implements KeyListener {
     //      i sumujemy
             FunkcjaLiniowa wynik = new FunkcjaLiniowa(systemSterowania.getSilnik(ktorySilnik).getFunkcjaCzujnika(2).getDziedzinaCzujnika());
             for (int i = 0; i < funkcjeWyjsciowe.size(); i++)
-                wynik = FunkcjaLiniowa.DodajFunkcje(wynik, funkcjeWyjsciowe.get(i));
+                wynik = DodajFunkcje(wynik, funkcjeWyjsciowe.get(i));
 
     //      no to liczymy wyjście
             double licznik = 0;
@@ -681,6 +679,45 @@ public class PanelGry extends JPanel implements KeyListener {
             else
                 sterowanieSkretem = licznik/mianownik;
         }
+    }
+
+    private FunkcjaLiniowa DodajFunkcje(FunkcjaLiniowa f0, FunkcjaLiniowa f1) {
+        FunkcjaLiniowa result;
+        if (f0.getDziedzinaCzujnika().equals(f1.getDziedzinaCzujnika()))
+             result = new FunkcjaLiniowa(f0.getDziedzinaCzujnika());
+        else{
+            result = new FunkcjaLiniowa(new DziedzinaCzujnika(
+                    f0.getDziedzinaCzujnika().isDziedzinaCzyOdNiesk() || f0.getDziedzinaCzujnika().isDziedzinaCzyOdNiesk(),
+                    Math.min(f0.getDziedzinaCzujnika().getDziedzinaOdWart(), f1.getDziedzinaCzujnika().getDziedzinaOdWart()),
+                    f0.getDziedzinaCzujnika().isDziedzinaOdCzyNalezy() || f1.getDziedzinaCzujnika().isDziedzinaOdCzyNalezy(),
+                    f0.getDziedzinaCzujnika().isDziedzinaCzyDoNiesk() || f1.getDziedzinaCzujnika().isDziedzinaCzyDoNiesk(),
+                    Math.max(f0.getDziedzinaCzujnika().getDziedzinaDoWart(), f1.getDziedzinaCzujnika().getDziedzinaDoWart()),
+                    f0.getDziedzinaCzujnika().isDziedzinaDoCzyNalezy() || f1.getDziedzinaCzujnika().isDziedzinaDoCzyNalezy()));
+        }
+        for (int i=0; i<f0.getPunkty().size(); i++)
+            if (f0.getPunkty().get(i).getY()>=f1.WartoscFunkcji(f0.getPunkty().get(i).getX()))
+                result.Dodaj(f0.getPunkty().get(i));
+        for (int i=0; i<f1.getPunkty().size(); i++)
+            if (f1.getPunkty().get(i).getY()>=f0.WartoscFunkcji(f1.getPunkty().get(i).getX()))
+                result.Dodaj(f1.getPunkty().get(i));
+        for (int i=1; i<f0.getPunkty().size(); i++)
+            if (((f0.getPunkty().get(i-1).getY()>f1.WartoscFunkcji(f0.getPunkty().get(i-1).getX())) && (f0.getPunkty().get(i).getY()<f1.WartoscFunkcji(f0.getPunkty().get(i).getX()))) ||
+                ((f0.getPunkty().get(i-1).getY()<f1.WartoscFunkcji(f0.getPunkty().get(i-1).getX())) && (f0.getPunkty().get(i).getY()>f1.WartoscFunkcji(f0.getPunkty().get(i).getX())))){
+                double a0, b0, a1, b1;
+                double x0, y0, x1, y1;
+                x0 = f0.getPunkty().get(i-1).getX();
+                x1 = f0.getPunkty().get(i).getX();
+                y0 = f0.getPunkty().get(i-1).getY();
+                y1 = f0.getPunkty().get(i).getY();
+                a0 = (y1-y0)/(x1-x0);
+                b0 = y0-x0*(y1-y0)/(x1-x0);
+                y0 = f1.WartoscFunkcji(x0);
+                y1 = f1.WartoscFunkcji(x1);
+                a1 = (y1-y0)/(x1-x0);
+                b1 = y0-x0*(y1-y0)/(x1-x0);
+                result.Dodaj(new Punkt((b1-b0)/(a0-a1), a1*(b1-b0)/(a0-a1)+b1));
+            }
+        return result;
     }
 
     public FunkcjaLiniowa PrzytnijDoWartosci(FunkcjaLiniowa funkcja, double y) {
