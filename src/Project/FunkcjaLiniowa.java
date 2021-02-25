@@ -98,7 +98,7 @@ public class FunkcjaLiniowa {
             return punkty.get(0).getY();
         if (x>=punkty.get(punkty.size()-1).getX())
             return punkty.get(punkty.size()-1).getY();
-        for (int i=1; i<punkty.size()-1;i++)
+        for (int i=1; i<punkty.size();i++)
             if ((x>=punkty.get(i-1).getX()) && (x<=punkty.get(i).getX())) {
                 double x0, x1, y0,y1;
                 x0 = punkty.get(i-1).getX();
