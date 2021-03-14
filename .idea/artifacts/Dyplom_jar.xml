@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="Dyplom:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Dyplom_jar</output-path>
+    <root id="archive" name="Dyplom.jar">
+      <element id="module-output" name="Dyplom" />
+      <element id="dir-copy" path="$PROJECT_DIR$/resources" />
+    </root>
+  </artifact>
+</component>

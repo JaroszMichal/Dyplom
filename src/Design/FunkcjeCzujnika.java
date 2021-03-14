@@ -50,7 +50,7 @@ public class FunkcjeCzujnika extends JFrame{
         setTitle(title);
         mainPanel.setBorder(BorderFactory.createTitledBorder(title));
         OdswiezPolaFormularza(systemSterowania,ktorySilnik,ktoryCzujnik);
-        setLocation(20,40);
+        setLocation(20, 20);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         dodajButton.addActionListener(e -> {

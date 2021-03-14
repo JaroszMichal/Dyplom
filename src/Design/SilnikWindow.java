@@ -74,7 +74,7 @@ public class SilnikWindow extends JFrame {
         setTitle("Definiowanie silnika - "+title);
         mainPanel.setBorder(BorderFactory.createTitledBorder(title));
         UstawPolaFormularza(systemSterowania, mw, ktorySilnik);
-        setLocation(mw.getX()+mw.getWidth(),mw.getY()+y);
+        setLocation(20, 20);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         cz1definiujButton.addActionListener(e -> {

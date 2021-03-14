@@ -23,7 +23,7 @@ public class AutoWindow extends JFrame{
         add(mainPanel);
         setSize(400, 350);
         setTitle("Auto");
-        setLocation(mw.getX() + mw.getWidth(), mw.getY());
+        setLocation(20, 20);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setVisible(true);
         UstawPolaFormularza(systemSterowania);

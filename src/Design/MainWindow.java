@@ -23,7 +23,6 @@ public class MainWindow extends JFrame {
     private JLabel predkoscOpisLBL;
     private JButton skretBTN;
     private JButton startButton;
-    private JButton historiaButton;
     private JLabel skretIcoLBL;
     private JLabel light1LBL;
     private JLabel light2LBL;
@@ -74,6 +73,18 @@ public class MainWindow extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 graPNL.setImage(null);
                 TrasaWindow tw = new TrasaWindow(systemSterowania, MainWindow.this);
+            }
+        });
+        startButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                graPNL.setSystemSteruje(!graPNL.isSystemSteruje());
+                if (graPNL.isSystemSteruje()){
+                    startButton.setText("S T O P");
+                }
+                else {
+                    startButton.setText("S T A R T");
+                }
             }
         });
     }

@@ -75,6 +75,13 @@ public class PanelGry extends JPanel implements KeyListener {
         this.systemSterowania = systemSterowania;
     }
 
+    public boolean isSystemSteruje() {
+        return systemSteruje;
+    }
+
+    public void setSystemSteruje(boolean systemSteruje) {
+        this.systemSteruje = systemSteruje;
+    }
 
     public PanelGry(){
         addKeyListener(this);

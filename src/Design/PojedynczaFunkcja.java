@@ -34,7 +34,7 @@ public class PojedynczaFunkcja extends JFrame {
         add(mainPanel);
         int FrameHeight = 500;
         setSize(900,FrameHeight);
-        setLocation(fc.getX()+fc.getWidth(),fc.getY());
+        setLocation(20, 20);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         Object[] Kolumny = {"x", "y"};
