@@ -98,7 +98,12 @@ public class Silnik {
         for (int i=0;i<3;i++)
             funkcjaCzujnika[i].getListaFunkcji().clear();
         try {
-            Scanner scanner =new Scanner(file);
+            this.funkcjaCzujnika = new FunkcjaCzujnika[3];
+            this.funkcjaCzujnika[0] = new FunkcjaCzujnika();
+            this.funkcjaCzujnika[1] = new FunkcjaCzujnika();
+            this.funkcjaCzujnika[2] = new FunkcjaCzujnika();
+
+            Scanner scanner =new Scanner(file, "UTF-8");
             String linia;
             while (scanner.hasNext()){
                 linia = scanner.nextLine();

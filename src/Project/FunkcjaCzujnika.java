@@ -103,7 +103,7 @@ public class FunkcjaCzujnika {
         int result = 0;
         listaFunkcji.clear();
         try {
-            Scanner scanner =new Scanner(file);
+            Scanner scanner =new Scanner(file, "UTF-8");
             String linia;
             while (scanner.hasNext()){
                 linia = scanner.nextLine();

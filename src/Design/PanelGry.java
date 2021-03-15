@@ -18,7 +18,6 @@ public class PanelGry extends JPanel implements KeyListener {
     private boolean systemSteruje;
     private double sterowaniePredkoscia;
     private double sterowanieSkretem;
-
 //  tło - obraz, położenie zoom
     private BufferedImage image;
     private int carWidth;
@@ -181,7 +180,6 @@ public class PanelGry extends JPanel implements KeyListener {
         g2.setColor(Color.RED);
         Rectangle rectangle = new Rectangle(0, 0, this.getWidth(), 50);
         centerString(g2, rectangle, "AUTOSTEROWANIE", new Font("Helvetica", Font.BOLD, 20));
-
     }
 
     private void NarysujWskazaniaCzujnikow(Graphics2D g2) {
@@ -407,7 +405,6 @@ public class PanelGry extends JPanel implements KeyListener {
             carYdouble = image.getHeight()-polPrzekatnejAuta;
         ObliczPozycjeKol();
         ObliczCzujniki();
-        //komunikat += "Kolizja = "+kolizja;
     }
 
     private void ObliczCzujniki() {
@@ -687,7 +684,7 @@ public class PanelGry extends JPanel implements KeyListener {
                 }
             }
             if (ktorySilnik==0)
-                sterowaniePredkoscia = licznik/mianownik;
+                sterowaniePredkoscia = licznik / mianownik;
             else
                 sterowanieSkretem = licznik/mianownik;
         }
